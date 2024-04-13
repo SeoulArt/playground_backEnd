@@ -1,0 +1,25 @@
+package com.skybory.seoulArt.domain.ticket;
+
+import com.skybory.seoulArt.domain.ticket.dto.CreateTicketRequest;
+import com.skybory.seoulArt.domain.ticket.dto.CreateTicketResponse;
+import com.skybory.seoulArt.domain.ticket.entity.Ticket;
+
+public interface TicketService {
+	
+	// 티켓 만들기(=공연 예약하기)
+	Ticket createTicket(Long userIdx, Long eventIdx, Long seatIdx);
+
+    // 티켓 삭제하기
+	void deleteTicket(Long ticketIdx);
+
+	// 0413 level up
+	CreateTicketResponse createTicket(CreateTicketRequest request);
+
+	
+	Long create(final Ticket ticket) ;
+//    //공연 예매가능한지 확인
+//    boolean checkAvailability(Event event);
+
+	Long create(CreateTicketRequest createTicketRequest);
+
+}
