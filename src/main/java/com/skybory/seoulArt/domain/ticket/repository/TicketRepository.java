@@ -1,4 +1,4 @@
-package com.skybory.seoulArt.domain.ticket;
+package com.skybory.seoulArt.domain.ticket.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

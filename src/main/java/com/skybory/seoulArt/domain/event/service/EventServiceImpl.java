@@ -1,25 +1,34 @@
-package com.skybory.seoulArt.domain.event;
+package com.skybory.seoulArt.domain.event.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
 import com.skybory.seoulArt.domain.event.dto.EventDetailRequest;
+import com.skybory.seoulArt.domain.event.dto.RegisterEventDTO;
 import com.skybory.seoulArt.domain.event.entity.Creator;
 import com.skybory.seoulArt.domain.event.entity.Event;
+import com.skybory.seoulArt.domain.event.repository.CreatorRepository;
+import com.skybory.seoulArt.domain.event.repository.EventRepository;
+import com.skybory.seoulArt.domain.event.dto.EventCreatorDetailResponse;
 import com.skybory.seoulArt.domain.event.dto.EventCreatorListResponse;
 import com.skybory.seoulArt.domain.event.dto.EventDescriptionResponse;
 import com.skybory.seoulArt.global.exception.ErrorCode;
 import com.skybory.seoulArt.global.exception.ServiceException;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
+// 트랜잭션 리드온리 추가해야함
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class EventServiceImpl implements EventService{
 
 	private final EventRepository eventRepository;
+	private final CreatorRepository creatorRepository;
 	
     @Override
     public Event createEvent(RegisterEventDTO registerEventDTO) {
@@ -67,21 +76,37 @@ public class EventServiceImpl implements EventService{
 //		Event event = eventRepository.findById(request.getId())
 //				.orElseThrow(() -> new ServiceException(ErrorCode.EVENT_NOT_FOUND));
 		// 정보 가져오기 및 반환하기
-		return eventRepository.getEventDetail(request.getId())
+		return eventRepository.findEventDeatilByEventIdx(request.getId())
 				.orElseThrow(() -> new ServiceException(ErrorCode.EVENT_NOT_FOUND));
 	}
 
 	@Override
-	public EventCreatorListResponse showCreatorList(long eventId) {
+	public EventCreatorListResponse showCreatorList(long eventIdx) {
+//		// 이벤트 찾기
+//		Event event = eventRepository.findById(eventId).orElseThrow();
+//		
+//		// 크리에이터 꺼내기
+//		List<Creator> creator = event.getCreator();
+//		   // EventCreatorListResponse에 설정
+//	    EventCreatorListResponse response = new EventCreatorListResponse(creator);
+		return eventRepository.findCreatorByEventIdx(eventIdx)
+				.orElseThrow(() -> new ServiceException(ErrorCode.CREATOR_NOT_FOUND));
+	}
 
-		// 이벤트 찾기
-		Event event = eventRepository.findById(eventId).orElseThrow();
+	@Override
+	public EventCreatorDetailResponse showCreatorDetail(long creatorIdx) {
+
+		// 창작자 찾기
+		Creator creator =creatorRepository.findById(creatorIdx)
+				.orElseThrow(() -> new ServiceException(ErrorCode.CREATOR_NOT_FOUND));
+		// 값 매핑하기
+		EventCreatorDetailResponse response = new EventCreatorDetailResponse();
+		response.setDepartment(creator.getDepartment());
+		response.setDescription(creator.getDescription());
+		response.setId(creatorIdx);
+		response.setImage(creator.getImage());
+		response.setName(creator.getName());
 		
-		// 크리에이터 꺼내기
-		List<Creator> creator = event.getCreator();
-		   // EventCreatorListResponse에 설정
-	    EventCreatorListResponse response = new EventCreatorListResponse(creator);
-
 		return response;
 	}
 

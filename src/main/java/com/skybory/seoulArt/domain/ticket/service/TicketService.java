@@ -1,4 +1,4 @@
-package com.skybory.seoulArt.domain.ticket;
+package com.skybory.seoulArt.domain.ticket.service;
 
 import com.skybory.seoulArt.domain.ticket.dto.CreateTicketRequest;
 import com.skybory.seoulArt.domain.ticket.dto.CreateTicketResponse;

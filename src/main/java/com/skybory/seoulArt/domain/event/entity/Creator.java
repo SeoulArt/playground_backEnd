@@ -12,18 +12,19 @@ import lombok.Getter;
 @Getter
 public class Creator {
 	@Id
-	long id;
+	long creatorIdx;
 	
 	String name;
 	String department;
+	String image;
 	String description;
 	@ManyToOne		// Creator가 이벤트의 주인이 됨
 	@JoinColumn
 	@JsonIgnoreProperties({"creator"})
 	Event event;
 
-	public void setId(long id) {
-		this.id = id;
+	public void setIdx(long creatorIdx) {
+		this.creatorIdx = creatorIdx;
 	}
 
 	public void setName(String name) {

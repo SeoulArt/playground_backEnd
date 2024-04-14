@@ -1,9 +1,8 @@
-package com.skybory.seoulArt.domain.event;
+package com.skybory.seoulArt.domain.event.repository;
+
 
 
 import java.util.Optional;
-
-//import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -14,7 +13,8 @@ import com.skybory.seoulArt.domain.event.entity.Event;
 
 public interface EventRepository extends JpaRepository<Event, Long> {
 	
-	public Optional<EventDescriptionResponse> getEventDetail(Long id);
+	Optional<EventDescriptionResponse> findEventDeatilByEventIdx(Long eventIdx);
 
-	public Optional<EventCreatorListResponse> getCreatorList(long eventId);
+	Optional<EventCreatorListResponse> findCreatorByEventIdx(Long eventIdx);
+
 }

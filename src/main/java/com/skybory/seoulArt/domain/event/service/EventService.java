@@ -1,10 +1,12 @@
-package com.skybory.seoulArt.domain.event;
+package com.skybory.seoulArt.domain.event.service;
 
 import java.util.List;
 import java.util.Optional;
 
 import com.skybory.seoulArt.domain.event.dto.EventDetailRequest;
+import com.skybory.seoulArt.domain.event.dto.RegisterEventDTO;
 import com.skybory.seoulArt.domain.event.entity.Event;
+import com.skybory.seoulArt.domain.event.dto.EventCreatorDetailResponse;
 import com.skybory.seoulArt.domain.event.dto.EventCreatorListResponse;
 import com.skybory.seoulArt.domain.event.dto.EventDescriptionResponse;
 
@@ -26,6 +28,8 @@ public interface EventService {
 	EventDescriptionResponse showDetail(EventDetailRequest request);
 
 	EventCreatorListResponse showCreatorList(long eventId);
+
+	EventCreatorDetailResponse showCreatorDetail(long creatorId);
 
 //	EventDetailResponse showDetail(EventDetailRequest request);
 

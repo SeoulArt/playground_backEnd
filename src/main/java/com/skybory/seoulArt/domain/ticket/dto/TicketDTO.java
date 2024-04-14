@@ -1,4 +1,4 @@
-package com.skybory.seoulArt.domain.ticket;
+package com.skybory.seoulArt.domain.ticket.dto;
 
 import lombok.Getter;
 import lombok.Setter;

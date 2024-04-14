@@ -1,8 +1,9 @@
-package com.skybory.seoulArt.domain.ticket;
+package com.skybory.seoulArt.domain.ticket.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.skybory.seoulArt.domain.ticket.dto.CreateTicketRequest;
 import com.skybory.seoulArt.domain.ticket.dto.CreateTicketResponse;
+import com.skybory.seoulArt.domain.ticket.service.TicketService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -23,6 +25,14 @@ public class TicketController {
 	// 인터페이스를 호출하면 구현체가 같이 호출됨
 	private final TicketService ticketService;
 
+	// 예매서비스(figma) 홈
+	// 이 부분 어떻게 고칠지 생각해봐야함.
+//	@GetMapping("/main")
+//	public ResponseEntity<Long> main(@RequestBody Long eventIdx) {
+//		return eventIdx;
+//	}
+	
+	
 	// 티켓 만들기, 에러처리 완료.
 	@PostMapping("/create")
 	public CreateTicketResponse create(@RequestBody CreateTicketRequest request) {

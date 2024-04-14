@@ -1,15 +1,16 @@
-package com.skybory.seoulArt.domain.ticket;
+package com.skybory.seoulArt.domain.ticket.service;
 
 import org.springframework.stereotype.Service;
 
-import com.skybory.seoulArt.domain.event.EventRepository;
 import com.skybory.seoulArt.domain.event.entity.Event;
+import com.skybory.seoulArt.domain.event.repository.EventRepository;
 import com.skybory.seoulArt.domain.seat.Seat;
 import com.skybory.seoulArt.domain.seat.SeatRepository;
 import com.skybory.seoulArt.domain.seat.SeatStatus;
 import com.skybory.seoulArt.domain.ticket.dto.CreateTicketRequest;
 import com.skybory.seoulArt.domain.ticket.dto.CreateTicketResponse;
 import com.skybory.seoulArt.domain.ticket.entity.Ticket;
+import com.skybory.seoulArt.domain.ticket.repository.TicketRepository;
 import com.skybory.seoulArt.domain.user.User;
 import com.skybory.seoulArt.domain.user.UserRepository;
 import com.skybory.seoulArt.global.exception.ErrorCode;
