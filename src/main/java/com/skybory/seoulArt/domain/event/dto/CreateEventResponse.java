@@ -1,11 +1,13 @@
 package com.skybory.seoulArt.domain.event.dto;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class RegisterEventDTO {
+@NoArgsConstructor
+public class CreateEventResponse {
 
 	private String eventTitle;
 	private String eventDetail;

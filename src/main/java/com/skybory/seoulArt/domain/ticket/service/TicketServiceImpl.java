@@ -34,9 +34,9 @@ public class TicketServiceImpl implements TicketService {
 	public Ticket createTicket(Long userIdx, Long eventIdx, Long seatIdx) {
 
 		// 사용자, 이벤트 및 좌석 정보 조회
-		User user = userRepository.findById(userIdx) .orElseThrow(() -> new IllegalArgumentException("해당 사용자를 찾을 수 없습니다."));
-		Event event = eventRepository.findById(eventIdx) .orElseThrow(() -> new IllegalArgumentException("해당 이벤트를 찾을 수 없습니다."));
-		Seat seat = seatRepository.findById(seatIdx) .orElseThrow(() -> new IllegalArgumentException("해당 좌석을 찾을 수 없습니다."));
+		User user = userRepository.findById(userIdx) .orElseThrow(() -> new ServiceException(ErrorCode.USER_NOT_FOUND));
+		Event event = eventRepository.findById(eventIdx) .orElseThrow(() -> new ServiceException(ErrorCode.EVENT_NOT_FOUND));
+		Seat seat = seatRepository.findById(seatIdx) .orElseThrow(() -> new ServiceException(ErrorCode.SEAT_NOT_FOUND));
 
 		// 티켓 생성 로직
 		Ticket ticket = new Ticket();
@@ -114,6 +114,12 @@ public class TicketServiceImpl implements TicketService {
 
 	@Override
 	public Long create(Ticket ticket) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Object findById(long ticketId) {
 		// TODO Auto-generated method stub
 		return null;
 	}

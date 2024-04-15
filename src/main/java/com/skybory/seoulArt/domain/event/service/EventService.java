@@ -4,17 +4,16 @@ import java.util.List;
 import java.util.Optional;
 
 import com.skybory.seoulArt.domain.event.dto.EventDetailRequest;
-import com.skybory.seoulArt.domain.event.dto.RegisterEventDTO;
+import com.skybory.seoulArt.domain.event.dto.CreateEventRequest;
+import com.skybory.seoulArt.domain.event.dto.CreateEventResponse;
 import com.skybory.seoulArt.domain.event.entity.Event;
-import com.skybory.seoulArt.domain.event.dto.EventCreatorDetailResponse;
-import com.skybory.seoulArt.domain.event.dto.EventCreatorListResponse;
 import com.skybory.seoulArt.domain.event.dto.EventDescriptionResponse;
 
 
 public interface EventService {
 
 	// 이벤트 생성
-	Event createEvent(RegisterEventDTO registerEventDTO);
+	CreateEventResponse createEvent(CreateEventRequest request);
 	
 	// 모든 이벤트 조회
 	List<Event> getAllEvents();
@@ -23,13 +22,13 @@ public interface EventService {
 	Event getEventById(Long eventIdx);
 	
 	// 이벤트 삭제
-	void deleteEventById(Long eventIdx);
+	boolean deleteEventById(Long eventIdx);
 
 	EventDescriptionResponse showDetail(EventDetailRequest request);
 
-	EventCreatorListResponse showCreatorList(long eventId);
+//	EventCreatorListResponse showCreatorList(long eventId);
 
-	EventCreatorDetailResponse showCreatorDetail(long creatorId);
+//	CreatorDetailResponse showCreatorDetail(long creatorId);
 
 //	EventDetailResponse showDetail(EventDetailRequest request);
 

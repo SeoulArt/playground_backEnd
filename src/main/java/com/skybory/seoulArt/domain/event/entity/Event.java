@@ -39,9 +39,9 @@ public class Event {
 	@JsonIgnoreProperties({"event"})
 	private List<Ticket> ticket = new ArrayList<>();
 	
-	@OneToMany(mappedBy = "event")
-	@JsonIgnoreProperties({"event"})
-	private List<Creator> creator = new ArrayList<>();
+//	@OneToMany(mappedBy = "event")
+//	@JsonIgnoreProperties({"event"})
+//	private List<Creator> creator = new ArrayList<>();
 	
 	private String eventTitle;
 	private String eventDetail;

@@ -1,8 +1,9 @@
-package com.skybory.seoulArt.domain.reply;
+package com.skybory.seoulArt.domain.reply.entity;
 
 import java.time.LocalDateTime;
 
 import com.skybory.seoulArt.domain.user.User;
+import com.skybory.seoulArt.global.QnAType;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -36,6 +37,10 @@ public class Reply {
 	
 	private String replyCommemt;
 	
+	private String nickname;
+	
 	private LocalDateTime replyDateTime;
+	
+	private QnAType type;
 	
 }

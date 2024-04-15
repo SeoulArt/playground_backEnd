@@ -2,8 +2,9 @@ package com.skybory.seoulArt.domain.user;
 
 import java.util.List;
 
-import com.skybory.seoulArt.domain.reply.Reply;
+import com.skybory.seoulArt.domain.reply.entity.Reply;
 import com.skybory.seoulArt.domain.ticket.entity.Ticket;
+import com.skybory.seoulArt.global.Dept;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -36,6 +37,7 @@ public class User {
 
     private String email;
 
+    // 역할로는 ROLE_USER , ROLE_ADMIN , ROLE_CREATOR 가 있다.
     private String role;
     
 	@OneToOne(mappedBy = "user" )
@@ -43,4 +45,10 @@ public class User {
 		
     @OneToMany(mappedBy = "user")
     private List<Reply> replies;
+    
+    // creator 들만 사용해야함
+    private Dept department;	// "작품1" , "작품2", "작품3", 기획팀
+    private String image;		// 창작자 사진
+    private String description;	// 창작자 소개(figma : '너무좋아요' 에 해당)
+    
 }

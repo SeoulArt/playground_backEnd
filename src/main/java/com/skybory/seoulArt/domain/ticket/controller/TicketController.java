@@ -1,6 +1,7 @@
 package com.skybory.seoulArt.domain.ticket.controller;
 
 import org.springframework.http.ResponseEntity;
+
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,12 +33,18 @@ public class TicketController {
 //		return eventIdx;
 //	}
 	
-	
-	// 티켓 만들기, 에러처리 완료.
+	// '예약하기 버튼' 누를 때 -> 예매완료 화면으로 이동
 	@PostMapping("/create")
-	public CreateTicketResponse create(@RequestBody CreateTicketRequest request) {
-		return ticketService.createTicket(request);
+	public ResponseEntity<CreateTicketResponse> create(@RequestBody CreateTicketRequest request) {
+		return ResponseEntity.ok(ticketService.createTicket(request));
 	}
+
+//	// '예약확인'
+//	@GetMapping("/find")
+//	public ResponseEntity<CreateTicketResponse> afterCreate(@RequestBody long ticketId) {
+//		return ResponseEntity.ok(ticketService.findById(ticketId));
+//	}
+	
 	
 
 //		// 매핑
