@@ -4,7 +4,6 @@ import org.springframework.stereotype.Service;
 
 import com.skybory.seoulArt.domain.event.entity.Event;
 import com.skybory.seoulArt.domain.event.repository.EventRepository;
-import com.skybory.seoulArt.domain.seat.SeatStatus;
 import com.skybory.seoulArt.domain.seat.entity.Seat;
 import com.skybory.seoulArt.domain.seat.repository.SeatRepository;
 import com.skybory.seoulArt.domain.ticket.dto.CreateTicketRequest;
@@ -13,6 +12,7 @@ import com.skybory.seoulArt.domain.ticket.entity.Ticket;
 import com.skybory.seoulArt.domain.ticket.repository.TicketRepository;
 import com.skybory.seoulArt.domain.user.UserRepository;
 import com.skybory.seoulArt.domain.user.entity.User;
+import com.skybory.seoulArt.global.SeatStatus;
 import com.skybory.seoulArt.global.exception.ErrorCode;
 import com.skybory.seoulArt.global.exception.ServiceException;
 
@@ -29,40 +29,59 @@ public class TicketServiceImpl implements TicketService {
 	private final EventRepository eventRepository;
 	private final SeatRepository seatRepository;
 
-	// 공연 예약하기
-	@Override
-	public Ticket createTicket(Long userIdx, Long eventIdx, Long seatIdx) {
-
-		// 사용자, 이벤트 및 좌석 정보 조회
-		User user = userRepository.findById(userIdx) .orElseThrow(() -> new ServiceException(ErrorCode.USER_NOT_FOUND));
-		Event event = eventRepository.findById(eventIdx) .orElseThrow(() -> new ServiceException(ErrorCode.EVENT_NOT_FOUND));
-		Seat seat = seatRepository.findById(seatIdx) .orElseThrow(() -> new ServiceException(ErrorCode.SEAT_NOT_FOUND));
-
-		// 티켓 생성 로직
-		Ticket ticket = new Ticket();
-		ticket.setUser(user);
-		ticket.changeEvent(event);
-		ticket.setSeat(seat);
-		ticket.getSeat().setSeatStatus(SeatStatus.RESERVED);
-		// 티켓 저장 및 반환
-		return ticketRepository.save(ticket);
-	}
+//	@Override
+//	public CreateTicketResponse createTicket(CreateTicketRequest request) {
+//		// 사용자, 이벤트 및 좌석 정보 조회
+//		User user = userRepository.findById(request.getUserIdx()) .orElseThrow(() -> new ServiceException(ErrorCode.USER_NOT_FOUND));
+//		Event event = eventRepository.findById(request.getEventIdx()) .orElseThrow(() -> new ServiceException(ErrorCode.EVENT_NOT_FOUND));
+//		Seat seat = seatRepository.findById(request.getSeatIdx()) .orElseThrow(() -> new ServiceException(ErrorCode.SEAT_NOT_FOUND));
+//
+//		// 티켓 생성 로직
+//		Ticket ticket = new Ticket();
+//		ticket.setUser(user);
+//		ticket.changeEvent(event);
+//		ticket.setSeat(seat);
+//		ticket.getSeat().setSeatStatus(SeatStatus.RESERVED);
+//		// 티켓 저장 및 반환
+//		return ticketRepository.save(ticket);
+//	}
+//	// 공연 예약하기
+//	@Override
+//	public Ticket createTicket(Long userIdx, Long eventIdx, Long seatIdx) {
+//
+//		// 사용자, 이벤트 및 좌석 정보 조회
+//		User user = userRepository.findById(userIdx) .orElseThrow(() -> new ServiceException(ErrorCode.USER_NOT_FOUND));
+//		Event event = eventRepository.findById(eventIdx) .orElseThrow(() -> new ServiceException(ErrorCode.EVENT_NOT_FOUND));
+//		Seat seat = seatRepository.findById(seatIdx) .orElseThrow(() -> new ServiceException(ErrorCode.SEAT_NOT_FOUND));
+//
+//		// 티켓 생성 로직
+//		Ticket ticket = new Ticket();
+//		ticket.setUser(user);
+//		ticket.changeEvent(event);
+//		ticket.setSeat(seat);
+//		ticket.getSeat().setSeatStatus(SeatStatus.RESERVED);
+//		// 티켓 저장 및 반환
+//		return ticketRepository.save(ticket);
+//	}
 
 	@Override	// 무슨값 반환할지 못정했음
-	public Long create(CreateTicketRequest createTicketRequest) {
+	public CreateTicketResponse create(CreateTicketRequest request) {
 		// 빈 자리 확인(boolean), 빈자리 없을시 오류 던짐
-		hasAvailableSeats(createTicketRequest.getEventIdx());
-		
+		hasAvailableSeats(request.getEventIdx());
 		// 티켓 생성
 		Ticket ticket = new Ticket();
-		
-		// 매핑
-		mapping(createTicketRequest, ticket);
-		
+		// 매핑 request -> ticket
+		mapping(request, ticket);
 		// DB저장
 		ticketRepository.save(ticket);
+		// DTO 반환
+		CreateTicketResponse response = new CreateTicketResponse();
+		// 매핑 request -> response
+		response.setEventIdx(request.getEventIdx());
+		response.setSeatIdx(request.getSeatIdx());
+		response.setUserIdx(request.getUserIdx());
 		
-		return ticket.getTicketIdx();
+		return response;
 	}
 	
 
@@ -74,11 +93,6 @@ public class TicketServiceImpl implements TicketService {
 		ticketRepository.deleteById(ticketIdx);
 	}
 
-	@Override
-	public CreateTicketResponse createTicket(CreateTicketRequest request) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	
 //	private void existTicket(final long ticketId) {
@@ -102,22 +116,17 @@ public class TicketServiceImpl implements TicketService {
 	
 	// 빈 자리 확인
 	private void hasAvailableSeats(long eventIdx) {
-		Event event = eventRepository.findById(eventIdx) .orElseThrow(() -> new ServiceException(ErrorCode.USER_NOT_FOUND));
+//		Event event = eventRepository.findById(eventIdx) .orElseThrow(() -> new ServiceException(ErrorCode.EVENT_NOT_FOUND));
 		// 총 좌석 수
 		int totalSeats = 50;
-		int bookedSeats = (int) ticketRepository.count();
+		int bookedSeats = (int) ticketRepository.countByEventEventIdx(eventIdx);
 		
 		if ( totalSeats <= bookedSeats) {
 			throw new ServiceException(ErrorCode.SEAT_UNAVAILABLE);
 		}
 	}
 
-	@Override
-	public Long create(Ticket ticket) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
+ 
 	@Override
 	public Object findById(long ticketId) {
 		// TODO Auto-generated method stub

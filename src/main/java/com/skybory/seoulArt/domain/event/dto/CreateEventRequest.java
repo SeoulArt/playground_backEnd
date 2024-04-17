@@ -7,7 +7,7 @@ import lombok.Setter;
 @Setter
 public class CreateEventRequest {
 
-	private String eventTitle;
-	private String eventDetail;
-	private String eventImage;
+	private String title;
+	private String detail;
+	private String image;
 }

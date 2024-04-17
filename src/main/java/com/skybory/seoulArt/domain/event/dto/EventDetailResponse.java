@@ -5,9 +5,9 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class EventDTO {
+public class EventDetailResponse {
 
-	private long id;
+	private long eventIdx;
 	private String title;
 	private String detail;
 	private String image;

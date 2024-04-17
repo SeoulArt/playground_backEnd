@@ -7,20 +7,20 @@ import com.skybory.seoulArt.domain.ticket.entity.Ticket;
 public interface TicketService {
 	
 	// 티켓 만들기(=공연 예약하기)
-	Ticket createTicket(Long userIdx, Long eventIdx, Long seatIdx);
+//	Ticket createTicket(Long userIdx, Long eventIdx, Long seatIdx);
 
     // 티켓 삭제하기
 	void deleteTicket(Long ticketIdx);
 
 	// 0413 level up
-	CreateTicketResponse createTicket(CreateTicketRequest request);
+//	CreateTicketResponse createTicket(CreateTicketRequest request);
 
 	
-	Long create(final Ticket ticket) ;
+//	Long create(final Ticket ticket) ;
 //    //공연 예매가능한지 확인
 //    boolean checkAvailability(Event event);
 
-	Long create(CreateTicketRequest createTicketRequest);
+	CreateTicketResponse create(CreateTicketRequest request);
 
 	Object findById(long ticketId);
 

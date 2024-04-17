@@ -1,6 +1,7 @@
 package com.skybory.seoulArt.domain.event.controller;
 
 import org.springframework.http.ResponseEntity;
+
 import org.springframework.ui.Model;
 //import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -12,14 +13,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.skybory.seoulArt.domain.event.dto.EventDetailRequest;
 import com.skybory.seoulArt.domain.event.dto.CreateEventRequest;
 import com.skybory.seoulArt.domain.event.entity.Event;
 import com.skybory.seoulArt.domain.event.service.EventService;
 
 
 import com.skybory.seoulArt.domain.event.dto.CreateEventResponse;
-import com.skybory.seoulArt.domain.event.dto.EventDescriptionResponse;
+import com.skybory.seoulArt.domain.event.dto.EventDetailResponse;
 
 import lombok.RequiredArgsConstructor;
 
@@ -32,43 +32,27 @@ public class EventController {
 	private final EventService eventService;
 	
 	
-	// 이벤트 조회 페이지(메인 이벤트)
-	// figma 작품소개 메인
-	@GetMapping("/{eventIdx}")
-	public ResponseEntity<Event> eventMain(@PathVariable Long eventIdx){
-		Event event = eventService.getEventById(eventIdx);
-		return ResponseEntity.ok(event);
-	}
-
-	// figma 작품소개 메인
-	@GetMapping("/main/1/thymeleaf")
-	public ResponseEntity<Event> eventMain2(Model model){
-		Event event = eventService.getEventById(1L);
-		model.addAttribute("events", event);
-		return ResponseEntity.ok(event);
+	// 작품 소개
+	@GetMapping("/{eventId}")	// postman 테스트 성공 0417
+	public ResponseEntity<EventDetailResponse> showDetail(@PathVariable long eventId){
+		return ResponseEntity.ok(eventService.showDetail(eventId));
 	}
 	
 	// 이벤트 생성 페이지 (관리자 권한)
-	@PostMapping("/create")
+	@PostMapping("/create")		// postman 테스트 성공 0417
 //	@Secured("ROLE_ADMIN") // 또는  @PreAuthorize("hasRole('ROLE_ADMIN')")
 	public ResponseEntity<CreateEventResponse> createEvent(@RequestBody CreateEventRequest request){
 		return ResponseEntity.ok(eventService.createEvent(request));
 	}
-
-	// 이벤트 생성 페이지 (관리자 권한)
-	@PostMapping("/create/thymeleaf")
-//	@Secured("ROLE_ADMIN") // 또는  @PreAuthorize("hasRole('ROLE_ADMIN')")
-	public ResponseEntity<CreateEventResponse> createEvent2(@ModelAttribute CreateEventRequest request){
-		return ResponseEntity.ok(eventService.createEvent(request));
+	
+	@DeleteMapping("/delete/{eventId}")
+//	@Secured("ROLE_ADMIN")
+	public ResponseEntity<Boolean> deleteEvent(@PathVariable long eventId){
+		return ResponseEntity.ok(eventService.deleteEventById(eventId));
 	}
+	
 	
 	// ==========================================4월13일. FIGMA 매칭 시작 + 리팩토링
-	// 작품 소개
-	@GetMapping("/detail")
-	public ResponseEntity<EventDescriptionResponse> showDetail(@RequestBody EventDetailRequest request){
-		return ResponseEntity.ok(eventService.showDetail(request));
-	}
-	
 //	// 창작자 소개 (전체)
 //	@GetMapping("/creators")
 //	public ResponseEntity<EventCreatorListResponse> showCreatorList(@RequestBody long eventIdx){
@@ -81,12 +65,6 @@ public class EventController {
 //		return ResponseEntity.ok(eventService.showCreatorDetail(creatorIdx));
 //	}
 //	
-	@DeleteMapping("/delete/{eventId}")
-//	@Secured("ROLE_ADMIN")
-	public ResponseEntity<Boolean> deleteEvent(@PathVariable long eventId){
-		return ResponseEntity.ok(eventService.deleteEventById(eventId));
-	}
-	
 	
 //	@GetMapping("/creator/{creatorId}")
 //	public ResponseEntity<CreatorDetail>

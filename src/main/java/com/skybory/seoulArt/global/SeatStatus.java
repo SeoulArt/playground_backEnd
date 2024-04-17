@@ -1,4 +1,4 @@
-package com.skybory.seoulArt.domain.seat;
+package com.skybory.seoulArt.global;
 
 // 좌석 상태 (3가지)
 public enum SeatStatus {

@@ -41,7 +41,7 @@ public class Ticket {
 	
 	@ManyToOne		// 티켓이 이벤트의 주인이 됨
 	@JoinColumn
-	@JsonIgnoreProperties({"ticket"})
+//	@JsonIgnoreProperties({"ticket"})
 	private Event event;
 	
 	public void changeEvent(Event event) {

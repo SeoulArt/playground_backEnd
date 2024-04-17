@@ -36,16 +36,16 @@ public class Event {
 	private Long eventIdx;
 	
 	@OneToMany(mappedBy = "event")
-	@JsonIgnoreProperties({"event"})
+//	@JsonIgnoreProperties({"event"})
 	private List<Ticket> ticket = new ArrayList<>();
 	
 //	@OneToMany(mappedBy = "event")
 //	@JsonIgnoreProperties({"event"})
 //	private List<Creator> creator = new ArrayList<>();
 	
-	private String eventTitle;
-	private String eventDetail;
-	private String eventImage;
+	private String title;
+	private String detail;
+	private String image;
 	@Override
 	public String toString() {
 		return " ]";

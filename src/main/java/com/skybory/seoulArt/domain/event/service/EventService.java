@@ -1,13 +1,12 @@
 package com.skybory.seoulArt.domain.event.service;
 
 import java.util.List;
-import java.util.Optional;
 
-import com.skybory.seoulArt.domain.event.dto.EventDetailRequest;
+import java.util.Optional;
 import com.skybory.seoulArt.domain.event.dto.CreateEventRequest;
 import com.skybory.seoulArt.domain.event.dto.CreateEventResponse;
 import com.skybory.seoulArt.domain.event.entity.Event;
-import com.skybory.seoulArt.domain.event.dto.EventDescriptionResponse;
+import com.skybory.seoulArt.domain.event.dto.EventDetailResponse;
 
 
 public interface EventService {
@@ -24,12 +23,5 @@ public interface EventService {
 	// 이벤트 삭제
 	boolean deleteEventById(Long eventIdx);
 
-	EventDescriptionResponse showDetail(EventDetailRequest request);
-
-//	EventCreatorListResponse showCreatorList(long eventId);
-
-//	CreatorDetailResponse showCreatorDetail(long creatorId);
-
-//	EventDetailResponse showDetail(EventDetailRequest request);
-
+	EventDetailResponse showDetail(long eventId);
 }

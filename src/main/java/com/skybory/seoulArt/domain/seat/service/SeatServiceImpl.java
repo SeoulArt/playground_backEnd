@@ -4,16 +4,13 @@ import java.util.ArrayList;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.skybory.seoulArt.domain.seat.SeatStatus;
 import com.skybory.seoulArt.domain.seat.dto.CreateSeatRequest;
 import com.skybory.seoulArt.domain.seat.dto.CreateSeatResponse;
 import com.skybory.seoulArt.domain.seat.entity.Seat;
 import com.skybory.seoulArt.domain.seat.repository.SeatRepository;
-
+import com.skybory.seoulArt.global.SeatStatus;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -25,17 +22,18 @@ public class SeatServiceImpl implements SeatService {
 
 	@Override	// 좌석 생성 : 이벤트당 한번만 해야함
 	@Transactional
-	public List<CreateSeatResponse> createSeats(CreateSeatRequest createSeatDTO) {
+	public List<CreateSeatResponse> createSeats(CreateSeatRequest request) {
 		
 		// 좌석 생성하기
-		int amount = createSeatDTO.getAmount();
-		long eventId = createSeatDTO.getEventId();
+		int amount = request.getAmount();
+		long eventId = request.getEventId();
 		List<Seat> seatList = new ArrayList<>();
 
 		for(long i=1; i<amount; i++) {
 		Seat seat = new Seat();
 				seat.setSeatStatus(SeatStatus.AVAILABLE);
 				seat.setSeatIdx(i);
+				seat.setEventIdx(request.getEventId());
 				seatList.add(seat);
 			}
 		seatRepository.saveAll(seatList);

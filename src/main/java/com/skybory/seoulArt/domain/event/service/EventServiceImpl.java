@@ -1,21 +1,13 @@
 package com.skybory.seoulArt.domain.event.service;
 
-import java.util.ArrayList;
-
-
 import java.util.List;
-import java.util.Optional;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.skybory.seoulArt.domain.event.dto.EventDetailRequest;
 import com.skybory.seoulArt.domain.event.dto.CreateEventRequest;
 import com.skybory.seoulArt.domain.event.dto.CreateEventResponse;
 import com.skybory.seoulArt.domain.event.entity.Event;
-//import com.skybory.seoulArt.domain.event.repository.CreatorRepository;
 import com.skybory.seoulArt.domain.event.repository.EventRepository;
-import com.skybory.seoulArt.domain.event.dto.EventDescriptionResponse;
+import com.skybory.seoulArt.domain.event.dto.EventDetailResponse;
 import com.skybory.seoulArt.global.exception.ErrorCode;
 import com.skybory.seoulArt.global.exception.ServiceException;
 
@@ -28,7 +20,6 @@ import lombok.RequiredArgsConstructor;
 public class EventServiceImpl implements EventService {
 
 	private final EventRepository eventRepository;
-//	private final CreatorRepository creatorRepository;
 
 	@Override
 	@Transactional
@@ -39,10 +30,6 @@ public class EventServiceImpl implements EventService {
 
 //        // 2. 새로운 이벤트 생성 및 매핑
 		Event event = mapJoinDTOToUser(request);
-//	    Event event = new Event();
-//	    event.setEventTitle(request.getEventTitle());
-//	    event.setEventDetail(request.getEventDetail());
-//	    event.setEventImage(request.getEventImage());
 
 		// 3. DB에 이벤트 저장
 		eventRepository.save(event);
@@ -51,19 +38,20 @@ public class EventServiceImpl implements EventService {
 		CreateEventResponse response = new CreateEventResponse();
 
 		// 5. dto에 값 미팽
-		response.setEventDetail(request.getEventDetail());
-		response.setEventImage(request.getEventImage());
-		response.setEventTitle(request.getEventTitle());
+		response.setEventDetail(request.getDetail());
+		response.setEventImage(request.getImage());
+		response.setEventTitle(request.getTitle());
 
 		// 6. 응답 반환
 		return response;
 	}
 
+	// 매핑 메서드
 	private Event mapJoinDTOToUser(CreateEventRequest registerEventDTO) {
 		Event event = new Event();
-		event.setEventTitle(registerEventDTO.getEventTitle());
-		event.setEventDetail(registerEventDTO.getEventDetail());
-		event.setEventImage(registerEventDTO.getEventImage());
+		event.setTitle(registerEventDTO.getTitle());
+		event.setDetail(registerEventDTO.getDetail());
+		event.setImage(registerEventDTO.getImage());
 
 		return event;
 	}
@@ -79,6 +67,7 @@ public class EventServiceImpl implements EventService {
 	}
 
 	@Override
+	@Transactional
 	public boolean deleteEventById(Long eventIdx) {
 		try {
 			eventRepository.deleteById(eventIdx);
@@ -89,13 +78,17 @@ public class EventServiceImpl implements EventService {
 	}
 
 	@Override
-	public EventDescriptionResponse showDetail(EventDetailRequest request) {
+	public EventDetailResponse showDetail(long eventId) {
 		// 이벤트 찾기
-//		Event event = eventRepository.findById(request.getId())
-//				.orElseThrow(() -> new ServiceException(ErrorCode.EVENT_NOT_FOUND));
-		// 정보 가져오기 및 반환하기
-		return eventRepository.findEventDeatilByEventIdx(request.getId())
+		Event event = eventRepository.findById(eventId)
 				.orElseThrow(() -> new ServiceException(ErrorCode.EVENT_NOT_FOUND));
+		// 정보 가져오기 및 반환하기
+		EventDetailResponse response = new EventDetailResponse();
+		response.setEventIdx(event.getEventIdx());
+		response.setTitle(event.getTitle());
+		response.setDetail(event.getDetail());
+		response.setImage(event.getImage());
+		return response;
 	}
 
 //	@Override

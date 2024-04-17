@@ -8,5 +8,5 @@ import com.skybory.seoulArt.domain.ticket.entity.Ticket;
 
 public interface TicketRepository extends JpaRepository<Ticket, Long>{
 
-	
+	int countByEventEventIdx(long eventIdx);
 }
