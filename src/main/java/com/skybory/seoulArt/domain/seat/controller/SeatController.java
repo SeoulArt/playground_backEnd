@@ -1,4 +1,4 @@
-package com.skybory.seoulArt.domain.seat;
+package com.skybory.seoulArt.domain.seat.controller;
 
 import java.util.List;
 
@@ -12,6 +12,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.skybory.seoulArt.domain.seat.dto.CreateSeatRequest;
+import com.skybory.seoulArt.domain.seat.dto.CreateSeatResponse;
+import com.skybory.seoulArt.domain.seat.service.SeatService;
+
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -22,16 +26,14 @@ public class SeatController {
 
 	private final SeatService seatService;
 	
-	@PostMapping("/create/seats")	// 정상 작동 확인 완료!!
-	public ResponseEntity<List<Seat>> createSeats(@RequestBody CreateSeatDTO createSeatDTO){
-		
+	@PostMapping("/create")		// 포스트맨 테스트 완료 0417
+	public ResponseEntity<List<CreateSeatResponse>> createSeats(@RequestBody CreateSeatRequest request){
 		// 좌석 생성
-		List<Seat> newSeats = seatService.createSeats(createSeatDTO);
-		
-		return ResponseEntity.ok(newSeats);
+//		seatService.createSeats(createSeatDTO);
+		return ResponseEntity.ok(seatService.createSeats(request));
 	}
 	
-	@DeleteMapping("delete/seat/{seatIdx}")	// 정상 작동 확인완료!
+	@DeleteMapping("delete/{seatIdx}")	// 포스트맨 테스트 완료 0417
 	public ResponseEntity<String> deleteSeat(@PathVariable long seatIdx) {
 		// 좌석 삭제
 		seatService.deleteSeat(seatIdx);

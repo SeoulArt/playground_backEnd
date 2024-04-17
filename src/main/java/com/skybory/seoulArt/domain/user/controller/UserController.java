@@ -24,15 +24,15 @@ public class UserController {
 	private final UserService userService;
 	
 	// 창작자 소개 (전체)
-	@GetMapping("/creators")
+	@GetMapping("/creators")	// postman 완료(0417)
 	public ResponseEntity<List<CreatorDetailResponse>> showCreatorList(){
 		return ResponseEntity.ok(userService.showCreatorList());
 	}
 	
 	// 창작자 소개2
-	@GetMapping("/creators/{creatorId}")
-	public ResponseEntity<CreatorDetailResponse> showCreatorDetail(@PathVariable long creatorId){
-		return ResponseEntity.ok(userService.showCreatorDetail(creatorId));
+	@GetMapping("/creators/{userId}")	// postman 완료(0417)
+	public ResponseEntity<CreatorDetailResponse> showCreatorDetail(@PathVariable long userId){
+		return ResponseEntity.ok(userService.showCreatorDetail(userId));
 	}
 	
 }

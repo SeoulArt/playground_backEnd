@@ -3,8 +3,9 @@ package com.skybory.seoulArt.domain.ticket.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.skybory.seoulArt.domain.event.entity.Event;
-import com.skybory.seoulArt.domain.seat.Seat;
-import com.skybory.seoulArt.domain.user.User;
+import com.skybory.seoulArt.domain.seat.entity.Seat;
+import com.skybory.seoulArt.domain.user.entity.User;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>이벤트 목록</title>
+</head>
+<body>
+    <h1>이벤트 목록</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>이벤트 제목</th>
+                <th>이벤트 설명</th>
+                <th>이벤트 이미지</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="event : ${events}">
+                <td th:text="${event.title}"></td>
+                <td th:text="${event.description}"></td>
+                <td><img th:src="@{'/main/thymeleaf/' + ${event.id}}" alt="이벤트 이미지" width="100"></td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>

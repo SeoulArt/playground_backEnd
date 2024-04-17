@@ -2,7 +2,7 @@ package com.skybory.seoulArt.domain.reply.entity;
 
 import java.time.LocalDateTime;
 
-import com.skybory.seoulArt.domain.user.User;
+import com.skybory.seoulArt.domain.user.entity.User;
 import com.skybory.seoulArt.global.QnAType;
 
 import jakarta.persistence.Entity;
@@ -35,7 +35,7 @@ public class Reply {
 	@ManyToOne
 	private User user;
 	
-	private String replyCommemt;
+	private String replyComment;
 	
 	private String nickname;
 	

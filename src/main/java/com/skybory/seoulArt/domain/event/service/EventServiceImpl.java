@@ -31,6 +31,7 @@ public class EventServiceImpl implements EventService {
 //	private final CreatorRepository creatorRepository;
 
 	@Override
+	@Transactional
 	public CreateEventResponse createEvent(CreateEventRequest request) {
 
 		// 1. validation 체크 해야할까?

@@ -36,6 +36,7 @@ public class TicketController {
 	// '예약하기 버튼' 누를 때 -> 예매완료 화면으로 이동
 	@PostMapping("/create")
 	public ResponseEntity<CreateTicketResponse> create(@RequestBody CreateTicketRequest request) {
+		System.out.println("=====CreateTicketResponse=====");
 		return ResponseEntity.ok(ticketService.createTicket(request));
 	}
 

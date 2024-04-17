@@ -1,4 +1,4 @@
-package com.skybory.seoulArt.domain.user;
+package com.skybory.seoulArt.domain.user.entity;
 
 import java.util.List;
 
@@ -48,7 +48,8 @@ public class User {
     
     // creator 들만 사용해야함
     private Dept department;	// "작품1" , "작품2", "작품3", 기획팀
-    private String image;		// 창작자 사진
+    private String profileImage;	// 창작자 프로필 사진
+    private String image;		// 창작자 게시글 사진
     private String description;	// 창작자 소개(figma : '너무좋아요' 에 해당)
     
 }

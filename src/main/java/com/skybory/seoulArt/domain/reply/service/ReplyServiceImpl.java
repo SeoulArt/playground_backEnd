@@ -4,14 +4,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
 import org.springframework.stereotype.Service;
-
 import com.skybory.seoulArt.domain.reply.dto.CreateReplyRequest;
 import com.skybory.seoulArt.domain.reply.dto.ReplyResponse;
 import com.skybory.seoulArt.domain.reply.entity.Reply;
 import com.skybory.seoulArt.domain.reply.repository.ReplyRepository;
-import com.skybory.seoulArt.domain.user.User;
+import com.skybory.seoulArt.domain.user.entity.User;
 import com.skybory.seoulArt.global.SessionConst;
 import com.skybory.seoulArt.global.exception.ErrorCode;
 import com.skybory.seoulArt.global.exception.ServiceException;
@@ -33,7 +31,7 @@ public class ReplyServiceImpl implements ReplyService {
 		User user = (User) session.getAttribute(SessionConst.LOGIN_MEMBER);
 		Reply reply = new Reply();
 		reply.setUser(user);
-		reply.setReplyCommemt(request.getReplyComment());
+		reply.setReplyComment(request.getReplyComment());
 		reply.setNickname(request.getNickname());
 		reply.setReplyDateTime(LocalDateTime.now());
 		
@@ -79,7 +77,7 @@ public class ReplyServiceImpl implements ReplyService {
 		                
 		                // 매핑
 		                response.setNickname(reply.getNickname());
-		                response.setReplyComment(reply.getReplyCommemt());
+		                response.setReplyComment(reply.getReplyComment());
 		                response.setReplyDateTime(reply.getReplyDateTime());
 		                return response;
 		            })
@@ -93,7 +91,7 @@ public class ReplyServiceImpl implements ReplyService {
 		ReplyResponse response = new ReplyResponse();
 		
 		response.setNickname(reply.getNickname());
-		response.setReplyComment(reply.getReplyCommemt());
+		response.setReplyComment(reply.getReplyComment());
 		response.setReplyDateTime(reply.getReplyDateTime());
 		
 		return Optional.of(response);

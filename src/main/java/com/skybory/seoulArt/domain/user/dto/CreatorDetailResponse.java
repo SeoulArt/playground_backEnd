@@ -13,4 +13,5 @@ public class CreatorDetailResponse {
 	private Dept department;
 	private String image;
 	private String description;
+	private String profileImage;
 }

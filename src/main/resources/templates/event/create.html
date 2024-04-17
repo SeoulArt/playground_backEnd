@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>이벤트 생성 페이지</title>
+</head>
+<body>
+    <h1>이벤트 생성</h1>
+    <form id="createEventForm" action="/event/create/thymeleaf" method="post" th:object="${request}">
+        <!-- 이벤트 생성에 필요한 입력 필드들을 추가 -->
+        <label for="eventName">이벤트 제목:</label>
+        <input type="text" id="eventTitle" name="eventTitle" th:value="${eventTitle}" required>
+        
+        <label for="eventDescription">이벤트 상세 설명:</label>
+        <textarea id="eventDetail" name="eventDetail" required th:text="${eventDetail}"></textarea>
+        
+        <label for="eventImage">이벤트 이미지 URL:</label>
+        <input type="text" id="eventImage" name="eventImage" th:value="${eventImage}" required>
+        
+        <button type="submit">이벤트 생성</button>
+    </form>
+</body>
+</html>

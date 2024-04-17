@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import com.skybory.seoulArt.domain.reply.entity.Reply;
+import com.skybory.seoulArt.domain.user.entity.User;
 import com.skybory.seoulArt.global.Dept;
 
 public interface UserRepository extends JpaRepository<User, Long> {
