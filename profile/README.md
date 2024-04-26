@@ -1,12 +1,8 @@
-## Hi there 👋
+# Playground 👋
 여기에 서비스 소개를 적습니다
-<!--
 
-**Here are some ideas to get you started:**
-
-🙋‍♀️ A short introduction - what is your organization all about?
-🌈 Contribution guidelines - how can the community get involved?
-👩‍💻 Useful resources - where can the community find your docs? Is there anything else the community should know?
-🍿 Fun facts - what does your team eat for breakfast?
-🧙 Remember, you can do mighty things with the power of [Markdown](https://docs.github.com/github/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax)
--->
+## 관련 링크
+- [회의 노트(작업 목록)](https://github.com/orgs/SeoulArt/projects/2)
+- [frontend repository](https://github.com/SeoulArt/client)
+- [backend repository]()
+- [design](https://www.figma.com/file/m9I7u4T5MwLe3gnjcOSYd3/ticketing?type=design&node-id=0%3A1&mode=design&t=doBZ2ZosY4R4uWD8-1)
