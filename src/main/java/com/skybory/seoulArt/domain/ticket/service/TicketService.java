@@ -2,6 +2,7 @@ package com.skybory.seoulArt.domain.ticket.service;
 
 import com.skybory.seoulArt.domain.ticket.dto.CreateTicketRequest;
 import com.skybory.seoulArt.domain.ticket.dto.CreateTicketResponse;
+import com.skybory.seoulArt.domain.ticket.dto.TicketDetailResponse;
 import com.skybory.seoulArt.domain.ticket.entity.Ticket;
 
 public interface TicketService {
@@ -10,7 +11,7 @@ public interface TicketService {
 //	Ticket createTicket(Long userIdx, Long eventIdx, Long seatIdx);
 
     // 티켓 삭제하기
-	void deleteTicket(Long ticketIdx);
+	void deleteTicket(long userId);
 
 	// 0413 level up
 //	CreateTicketResponse createTicket(CreateTicketRequest request);
@@ -22,6 +23,8 @@ public interface TicketService {
 
 	CreateTicketResponse create(CreateTicketRequest request);
 
-	Object findById(long ticketId);
+	TicketDetailResponse findTicket(long userId);
+
+//	Object findById(long ticketId);
 
 }

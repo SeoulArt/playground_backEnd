@@ -33,7 +33,7 @@ public class Ticket {
 			)
 	private Long ticketIdx;							// 티켓 고유 넘버
 	
-	@OneToOne		// User에 있는 Ticket의 객체명
+	@OneToOne(mappedBy = "ticket" )		// User에 있는 Ticket의 객체명
 	private User user;
 	
 	@OneToOne		// Seat에 있는 Ticket의 객체명

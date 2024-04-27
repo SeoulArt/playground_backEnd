@@ -15,6 +15,6 @@ public class CreateTicketRequest {
 
 	private long userIdx;
 
-	private long seatIdx;
+//	private long seatIdx;
 
 }

@@ -40,7 +40,7 @@ public class User {
     // 역할로는 ROLE_USER , ROLE_ADMIN , ROLE_CREATOR 가 있다.
     private String role;
     
-	@OneToOne(mappedBy = "user" )
+    @OneToOne /*(mappedBy = "user" )*/
 	private Ticket ticket;
 		
     @OneToMany(mappedBy = "user")

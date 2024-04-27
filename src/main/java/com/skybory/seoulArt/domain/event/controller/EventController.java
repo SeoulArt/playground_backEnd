@@ -45,34 +45,10 @@ public class EventController {
 		return ResponseEntity.ok(eventService.createEvent(request));
 	}
 	
-	@DeleteMapping("/delete/{eventId}")
+	@DeleteMapping("/delete/{eventId}")	// postman 테스트 성공 0418
 //	@Secured("ROLE_ADMIN")
 	public ResponseEntity<Boolean> deleteEvent(@PathVariable long eventId){
 		return ResponseEntity.ok(eventService.deleteEventById(eventId));
 	}
-	
-	
-	// ==========================================4월13일. FIGMA 매칭 시작 + 리팩토링
-//	// 창작자 소개 (전체)
-//	@GetMapping("/creators")
-//	public ResponseEntity<EventCreatorListResponse> showCreatorList(@RequestBody long eventIdx){
-//		return ResponseEntity.ok(eventService.showCreatorList(eventIdx));
-//	}
-//	
-//	// 창작자 소개2
-//	@GetMapping("/creators/{creatorId}")
-//	public ResponseEntity<EventCreatorDetailResponse> showCreatorDetail(@PathVariable long creatorIdx){
-//		return ResponseEntity.ok(eventService.showCreatorDetail(creatorIdx));
-//	}
-//	
-	
-//	@GetMapping("/creator/{creatorId}")
-//	public ResponseEntity<CreatorDetail>
-//	// Q&A 는 뭔지 모르겠음.
-//	
-//	@GetMapping("/Q&A")
-//	public ResponseEntity<T>
-//	
-	
 	
 }

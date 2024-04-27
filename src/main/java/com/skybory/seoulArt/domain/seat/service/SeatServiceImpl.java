@@ -29,13 +29,18 @@ public class SeatServiceImpl implements SeatService {
 		long eventId = request.getEventId();
 		List<Seat> seatList = new ArrayList<>();
 
-		for(long i=1; i<amount; i++) {
-		Seat seat = new Seat();
-				seat.setSeatStatus(SeatStatus.AVAILABLE);
-				seat.setSeatIdx(i);
-				seat.setEventIdx(request.getEventId());
-				seatList.add(seat);
-			}
+		// 1~3번 이벤트까지 한번에 생성
+//		for (int j = 1; j <= 3; j++) {
+			
+			for(long i=1; i<=amount; i++) {
+			Seat seat = new Seat();
+					seat.setSeatStatus(SeatStatus.AVAILABLE);
+//					seat.setSeatIdx(i);
+					seat.setEventIdx(request.getEventId());
+					seatList.add(seat);
+//					seatRepository.save(seat);
+				}
+//		}
 		seatRepository.saveAll(seatList);
 
 		// DTO로 옮겨담기
