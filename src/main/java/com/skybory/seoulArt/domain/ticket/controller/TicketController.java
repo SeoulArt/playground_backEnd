@@ -30,14 +30,14 @@ public class TicketController {
 
 	
 	@DeleteMapping("/delete/{userId}")	// 포스트맨 성공 0418
-	public ResponseEntity<String> deleteTicket(@PathVariable long userId) {
+	public ResponseEntity<String> deleteTicket(@PathVariable Long userId) {
 		ticketService.deleteTicket(userId);
 		return ResponseEntity.ok("Ticket successfully deleted");
 	}
 	
 	// '예약확인'
 	@GetMapping("/find/{userId}")	// 포스트맨 성공 0418.
-	public ResponseEntity<TicketDetailResponse> find(@PathVariable long userId) {
+	public ResponseEntity<TicketDetailResponse> find(@PathVariable Long userId) {
 		return ResponseEntity.ok(ticketService.findTicket(userId));
 	}
 	

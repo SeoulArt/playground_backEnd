@@ -17,7 +17,7 @@ import com.skybory.seoulArt.domain.seat.service.SeatService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@CrossOrigin(origins = "http://reactserver")
+//@CrossOrigin(origins = "http://reactserver")
 @RequiredArgsConstructor
 @RequestMapping("/api/seat")
 public class SeatController {

@@ -32,6 +32,8 @@ public class User {
 			generator = "USER_SEQ_GENERATOR"
 			)
     private Long id;
+	
+//	private String id;	// JWTAuthnticationFilter 때문에 추가했는데, 문제되면 확인해봐야함
 
     private String username;
 

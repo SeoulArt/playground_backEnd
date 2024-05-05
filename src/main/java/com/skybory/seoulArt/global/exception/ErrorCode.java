@@ -43,7 +43,7 @@ public enum ErrorCode {
 //    BOARD_MISS_MATCH(400, "B002", "해당 회원의 게시판이 아닙니다"),
 //    DUPLICATE_TITLE(400, "B003", "제목이 겹칩니다."),
 //
-//     // Ticket
+//     // Cocktail
     	TICKET_NOT_FOUND(400, "T001", "해당 티켓을 찾을 수 없습니다."),
     	TICKET_MISS_MATCH(400, "T002", "해당 회원의 티켓이 아닙니다"),
     	DUPLICATE_TICKET(400, "T003", "중복된 티켓입니다."),

@@ -20,7 +20,7 @@ import com.skybory.seoulArt.domain.reply.service.ReplyService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@CrossOrigin(origins = "http://reactserver")
+//@CrossOrigin(origins = "http://reactserver")
 @RequiredArgsConstructor
 @RequestMapping("/api/reply")
 public class ReplyController {

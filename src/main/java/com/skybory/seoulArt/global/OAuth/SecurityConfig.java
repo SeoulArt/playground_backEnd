@@ -21,6 +21,7 @@
 //	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 //
 //		http.csrf((csrf) -> csrf.disable());
+////		http.cors(null);			// 방금 추가함
 //
 //		http.formLogin((login) -> login.disable());
 //
@@ -31,7 +32,10 @@
 //						(userInfoEndpointConfig) -> userInfoEndpointConfig.userService(customOAuth2UserService)));
 //
 //		http.authorizeHttpRequests(
-//				(auth) -> auth.requestMatchers("/", "/login").permitAll().anyRequest().authenticated());
+//				(auth) -> auth.requestMatchers("/", "/login")
+//				.permitAll()
+//				.anyRequest()
+//				.authenticated());
 //
 //		return http.build();
 //	}
