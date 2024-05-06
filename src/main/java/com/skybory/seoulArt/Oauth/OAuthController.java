@@ -1,4 +1,4 @@
-package com.skybory.seoulArt.OauthWithReact;
+package com.skybory.seoulArt.Oauth;
 
 import java.util.Map;
 
@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
+import com.skybory.seoulArt.Oauth.dto.AccessTokenResponse;
 import com.skybory.seoulArt.domain.user.dto.UserDTO;
 import com.skybory.seoulArt.domain.user.service.UserService;
 
@@ -95,6 +96,7 @@ public class OAuthController {
 			// 액세스 토큰 받아오기
 			AccessTokenResponse accessTokenResponse = provider.getKakaoAccessToken(code);
 			String accessToken = accessTokenResponse.getAccess_token();
+			
 			// 토큰으로 사용자 정보 받아오기
 			KakaoMemberResponse kakaoMemberResponse = provider.getMemberInfo(accessToken);
 			// 아이디가 없으면 회원가입, 있우면 로그인하기
@@ -115,8 +117,19 @@ public class OAuthController {
 		}
 		else return null;
 	}
-
  
+	@PostMapping("refresh/token/{domain}")
+	@Operation(summary = "토큰 갱신하기", description = "토큰을 갱신합니다")
+	@ApiResponse(responseCode = "200", description = "요청 성공")
+	@ApiResponse(responseCode = "400", description = "요청 실패")
+	public ResponseEntity<AccessTokenResponse> refreshToken(@RequestBody RefreshTokenRequest request, @PathVariable("domain") String domain) throws Exception {
+
+		return ResponseEntity.ok(provider.refreshToken(request));
+	}
+
+}
+
+
 //	@Operation(summary = "네이버 로그인", description = "인가코드로 토큰을 받아오고 회원정보를 반환합니다")
 //	@ApiResponse(responseCode = "200", description = "요청 성공")
 //	@ApiResponse(responseCode = "400", description = "요청 실패")
@@ -137,11 +150,3 @@ public class OAuthController {
 //		// 서버로부터 받은 응답을 UserDTO 형태로 응답
 //		return ResponseEntity.ok(naverMemberResponse);
 //	}
-
-	@PostMapping("refresh/token")
-	public ResponseEntity<AccessTokenResponse> refreshToken() {
-
-		return null;
-	}
-
-}

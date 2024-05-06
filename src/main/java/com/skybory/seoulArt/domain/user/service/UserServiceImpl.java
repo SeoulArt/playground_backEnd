@@ -6,8 +6,8 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.skybory.seoulArt.OauthWithReact.KakaoMemberResponse;
-import com.skybory.seoulArt.OauthWithReact.NaverMemberResponse;
+import com.skybory.seoulArt.Oauth.KakaoMemberResponse;
+import com.skybory.seoulArt.Oauth.NaverMemberResponse;
 import com.skybory.seoulArt.domain.user.dto.CreatorDetailResponse;
 import com.skybory.seoulArt.domain.user.dto.UserDTO;
 import com.skybory.seoulArt.domain.user.entity.User;

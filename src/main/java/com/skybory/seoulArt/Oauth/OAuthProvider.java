@@ -1,4 +1,4 @@
-package com.skybory.seoulArt.OauthWithReact;
+package com.skybory.seoulArt.Oauth;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -12,7 +12,8 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.skybory.seoulArt.OauthWithReact.NaverMemberResponse.NaverUserDetail;
+import com.skybory.seoulArt.Oauth.NaverMemberResponse.NaverUserDetail;
+import com.skybory.seoulArt.Oauth.dto.AccessTokenResponse;
 
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
@@ -146,5 +147,31 @@ public class OAuthProvider {
         	throw new Exception(e.getMessage());
         }
     }
+        public AccessTokenResponse refreshToken(RefreshTokenRequest request) throws Exception {
+            try {
+                // HTTP 요청을 위한 RestTemplate 객체 생성
+                
+                HttpHeaders httpHeaders = new HttpHeaders();
+                httpHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+                
+                String clientId;
+                clientId = kakaoClientId;
+
+                MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+//                body.add("grant_type", "authorization_code");
+                body.add("client_id", clientId);
+                body.add("grant_type", "refresh_token");
+                body.add("client_secret", kakaoClientPw);
+                body.add("refresh_token", request.getRefresh_token());
+
+                HttpEntity<MultiValueMap<String, String>> postRequest = new HttpEntity<>(body, httpHeaders);
+//                RestTemplate restTemplate = new RestTemplate();
+
+                return restTemplate.postForEntity(
+                		tokenUri, postRequest, AccessTokenResponse.class).getBody();
+            } catch(Exception e) {
+            	throw new Exception(e.getMessage());
+            }
+        }
 
 }

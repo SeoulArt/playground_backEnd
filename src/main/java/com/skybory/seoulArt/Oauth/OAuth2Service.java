@@ -1,4 +1,4 @@
-package com.skybory.seoulArt.OauthWithReact;
+package com.skybory.seoulArt.Oauth;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
