@@ -1,21 +1,17 @@
 package com.skybory.seoulArt.Oauth;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
-
-import com.skybory.seoulArt.Oauth.NaverMemberResponse.NaverUserDetail;
 import com.skybory.seoulArt.Oauth.dto.AccessTokenResponse;
-
-import lombok.NoArgsConstructor;
+import com.skybory.seoulArt.Oauth.dto.KakaoMemberResponse;
+import com.skybory.seoulArt.Oauth.dto.NaverMemberResponse;
+import com.skybory.seoulArt.Oauth.dto.RefreshTokenRequest;
 import lombok.RequiredArgsConstructor;
 
 @Component

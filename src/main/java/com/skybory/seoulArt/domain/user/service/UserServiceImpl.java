@@ -2,12 +2,11 @@ package com.skybory.seoulArt.domain.user.service;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.skybory.seoulArt.Oauth.KakaoMemberResponse;
-import com.skybory.seoulArt.Oauth.NaverMemberResponse;
+import com.skybory.seoulArt.Oauth.dto.KakaoMemberResponse;
+import com.skybory.seoulArt.Oauth.dto.NaverMemberResponse;
 import com.skybory.seoulArt.domain.user.dto.CreatorDetailResponse;
 import com.skybory.seoulArt.domain.user.dto.UserDTO;
 import com.skybory.seoulArt.domain.user.entity.User;

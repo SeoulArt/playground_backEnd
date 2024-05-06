@@ -1,4 +1,4 @@
-package com.skybory.seoulArt.Oauth;
+package com.skybory.seoulArt.Oauth.dto;
 
 public interface OAuth2Response {
 

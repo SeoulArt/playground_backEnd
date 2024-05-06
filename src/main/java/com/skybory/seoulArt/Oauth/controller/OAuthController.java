@@ -1,7 +1,6 @@
-package com.skybory.seoulArt.Oauth;
+package com.skybory.seoulArt.Oauth.controller;
 
 import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -18,11 +17,16 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
-
+import com.skybory.seoulArt.Oauth.OAuthProvider;
 import com.skybory.seoulArt.Oauth.dto.AccessTokenResponse;
+import com.skybory.seoulArt.Oauth.dto.KakaoMemberResponse;
+import com.skybory.seoulArt.Oauth.dto.LoginRequest;
+import com.skybory.seoulArt.Oauth.dto.NaverMemberResponse;
+import com.skybory.seoulArt.Oauth.dto.RefreshTokenRequest;
+import com.skybory.seoulArt.Oauth.dto.UrlResponse;
+import com.skybory.seoulArt.Oauth.service.OAuth2Service;
 import com.skybory.seoulArt.domain.user.dto.UserDTO;
 import com.skybory.seoulArt.domain.user.service.UserService;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;

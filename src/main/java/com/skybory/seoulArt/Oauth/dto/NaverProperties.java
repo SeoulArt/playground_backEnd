@@ -1,4 +1,4 @@
-package com.skybory.seoulArt.Oauth;
+package com.skybory.seoulArt.Oauth.dto;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;

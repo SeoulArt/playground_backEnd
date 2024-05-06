@@ -1,4 +1,4 @@
-package com.skybory.seoulArt.Oauth;
+package com.skybory.seoulArt.Oauth.dto;
 
 import lombok.Getter;
 import lombok.Setter;
