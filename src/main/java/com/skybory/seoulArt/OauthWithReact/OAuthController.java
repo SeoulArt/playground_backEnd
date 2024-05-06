@@ -32,22 +32,10 @@ import lombok.RequiredArgsConstructor;
 public class OAuthController {
 
 //	private final RestTemplate restTemplate = new RestTemplate();
-	private final NaverProperties naverProperties = new NaverProperties();
-	OAuthProvider provider = new OAuthProvider(naverProperties);
+//	private final NaverProperties naverProperties = new NaverProperties();
+//	OAuthProvider provider = new OAuthProvider(naverProperties);
+	OAuthProvider provider = new OAuthProvider();
 
-//	@Value("${spring.security.oauth2.client.registration.naver.client-id}")
-//	private String naverClientId;
-//
-//	@Value("${spring.security.oauth2.client.registration.naver.redirect-uri}")
-//	private String naverRedirectUri;
-//
-//	@Value("${spring.security.oauth2.client.registration.kakao.client-id}")
-//	private String kakaoClientId;
-//
-//	@Value("${spring.security.oauth2.client.registration.kakao.redirect-uri}")
-//	private String kakaoRedirectUri;
-
-//	private final String KAKAO_TOKEN_URL = "https://kauth.kakao.com/oauth/token";
 
 	@Autowired
 	private OAuth2Service oAuth2Service; // OAuth2 서비스에 대한 의존성 주입
@@ -96,10 +84,10 @@ public class OAuthController {
 	@ApiResponse(responseCode = "200", description = "요청 성공")
 	@ApiResponse(responseCode = "400", description = "요청 실패")
 	@PostMapping("/{domain}/login")
-	public ResponseEntity<UserDTO> kakaoLogin(@RequestBody Map<String, String> requestBody, @PathVariable("domain") String domain)
+	public ResponseEntity<UserDTO> kakaoLogin(@RequestBody LoginRequest request, @PathVariable("domain") String domain)
 			throws Exception {
 
-		String code = requestBody.get("code");
+		String code = request.getCode();
 //		OAuthProvider provider = new OAuthProvider();
 
 		if (domain.equals("kakao")) {
@@ -128,48 +116,27 @@ public class OAuthController {
 		else return null;
 	}
 
+ 
 //	@Operation(summary = "네이버 로그인", description = "인가코드로 토큰을 받아오고 회원정보를 반환합니다")
 //	@ApiResponse(responseCode = "200", description = "요청 성공")
 //	@ApiResponse(responseCode = "400", description = "요청 실패")
-//	@PostMapping("/login/naver")
-//	public NaverUserResponse.NaverUserDetail naverlogin(@RequestBody Map<String, String> requestBody) throws Exception {
-//		
+//	@PostMapping("/login/naver/v2")
+//	public ResponseEntity<NaverMemberResponse> naverloginV2(@RequestBody Map<String, String> requestBody)
+//			throws Exception {
+//
 //		String code = requestBody.get("code");
 //		// 액세스 토큰 받아오기
-//		String accessToken = provider.getNaverAccessToken(code);
-//		HttpHeaders headers = new HttpHeaders();
-//		
-//		headers.setBearerAuth(accessToken);
-//		
-//		HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(headers);
-//		
-//		ResponseEntity<NaverUserResponse> response =
-//				restTemplate.exchange("https://openapi.naver.com/v1/nid/me", HttpMethod.GET, request, NaverUserResponse.class);
-//		
-//		
-//		return response.getBody().getNaverUserDetail();
+//		AccessTokenResponse accessTokenResponse = provider.getNaverAccessTokenV2(code);
+//
+//		String accessToken = accessTokenResponse.getAccess_token();
+//
+//		// 토큰으로 사용자 정보 받아오기
+//		NaverMemberResponse naverMemberResponse = provider.getNaverInfo(accessToken);
+//
+//		// 아이디가 없으면 회원가입, 있우면 로그인하기
+//		// 서버로부터 받은 응답을 UserDTO 형태로 응답
+//		return ResponseEntity.ok(naverMemberResponse);
 //	}
-
-	@Operation(summary = "네이버 로그인", description = "인가코드로 토큰을 받아오고 회원정보를 반환합니다")
-	@ApiResponse(responseCode = "200", description = "요청 성공")
-	@ApiResponse(responseCode = "400", description = "요청 실패")
-	@PostMapping("/login/naver/v2")
-	public ResponseEntity<NaverMemberResponse> naverloginV2(@RequestBody Map<String, String> requestBody)
-			throws Exception {
-
-		String code = requestBody.get("code");
-		// 액세스 토큰 받아오기
-		AccessTokenResponse accessTokenResponse = provider.getNaverAccessTokenV2(code);
-
-		String accessToken = accessTokenResponse.getAccess_token();
-
-		// 토큰으로 사용자 정보 받아오기
-		NaverMemberResponse naverMemberResponse = provider.getNaverInfo(accessToken);
-
-		// 아이디가 없으면 회원가입, 있우면 로그인하기
-		// 서버로부터 받은 응답을 UserDTO 형태로 응답
-		return ResponseEntity.ok(naverMemberResponse);
-	}
 
 	@PostMapping("refresh/token")
 	public ResponseEntity<AccessTokenResponse> refreshToken() {
@@ -177,27 +144,4 @@ public class OAuthController {
 		return null;
 	}
 
-//	// 토큰만 받아오는 메서드
-//	@Operation(summary = "토큰 받기", description = "토큰을 요청합니다")
-//	@ApiResponse(responseCode = "200", description = "요청 성공")
-//	@ApiResponse(responseCode = "400", description = "요청 실패")
-//	@PostMapping("/naver")
-//	public ResponseEntity<String> getNaverToken(@RequestBody Map<String, String> requestBody) throws Exception {
-//		String code = requestBody.get("code");
-//		return ResponseEntity.ok(provider.getNaverAccessToken(code));
-//	}
-//
-//}
-
-//	// 토큰만 받아오는 메서드
-//	@Operation(summary = "토큰 받기", description = "토큰을 요청합니다")
-//	@ApiResponse(responseCode = "200", description = "요청 성공")
-//	@ApiResponse(responseCode = "400", description = "요청 실패")
-//	@PostMapping("/kakao/token/onlyToken")
-//	public ResponseEntity<KakaoAccessTokenResponse> getToken(@RequestBody Map<String, String> requestBody) throws Exception {
-//	    String code = requestBody.get("code");
-//
-//	    KakaoAccessTokenResponse accessTokenResponse = provider.getKakaoAccessToken(code);
-//
-//	    return ResponseEntity.ok(accessTokenResponse);
 }

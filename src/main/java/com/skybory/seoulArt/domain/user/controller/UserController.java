@@ -14,6 +14,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.skybory.seoulArt.domain.user.dto.CreatorDetailResponse;
 import com.skybory.seoulArt.domain.user.service.UserService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -26,18 +29,27 @@ public class UserController {
 	
 	// 창작자 소개 (전체)
 	@GetMapping("/creators")	// postman 완료(0417)
+	@Operation(summary = "창작자 목록 조회", description = "모든 창작자를 조회합니다")
+	@ApiResponse(responseCode="200", description="성공")
+	@ApiResponse(responseCode="400", description="에러")
 	public ResponseEntity<List<CreatorDetailResponse>> showCreatorList(){
 		return ResponseEntity.ok(userService.showCreatorList());
 	}
 	
 	// 창작자 소개2
 	@GetMapping("/creators/{userId}")	// postman 완료(0417)
-	public ResponseEntity<CreatorDetailResponse> showCreatorDetail(@PathVariable Long userId){
+	@Operation(summary = "창작자 세부 조회", description = "해당 창작자의 세부사항을 조회합니다")
+	@ApiResponse(responseCode="200", description="성공")
+	@ApiResponse(responseCode="400", description="에러")
+	public ResponseEntity<CreatorDetailResponse> showCreatorDetail(@Parameter(description = "유저 id") @PathVariable Long userId){
 		return ResponseEntity.ok(userService.showCreatorDetail(userId));
 	}
 	
 	@DeleteMapping("/{userId}")	// postman 완료 (0506)
-	public ResponseEntity<?> delete(@PathVariable Long userId) {
+	@Operation(summary = "유저 삭제", description = "해당 유저를 삭제합니다")
+	@ApiResponse(responseCode="200", description="성공")
+	@ApiResponse(responseCode="400", description="에러")
+	public ResponseEntity<?> delete(@Parameter(description = "창작자 id") @PathVariable Long userId) {
 		userService.delete(userId);
 		return ResponseEntity.ok().build();
 	}

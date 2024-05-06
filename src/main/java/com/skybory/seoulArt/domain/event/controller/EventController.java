@@ -17,6 +17,9 @@ import com.skybory.seoulArt.domain.event.dto.CreateEventRequest;
 import com.skybory.seoulArt.domain.event.entity.Event;
 import com.skybory.seoulArt.domain.event.service.EventService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
 import com.skybory.seoulArt.domain.event.dto.CreateEventResponse;
 import com.skybory.seoulArt.domain.event.dto.EventDetailResponse;
@@ -31,23 +34,32 @@ public class EventController {
 
 	private final EventService eventService;
 	
-	
-	// 작품 소개
-	@GetMapping("/{eventId}")	// postman 테스트 성공 0417
-	public ResponseEntity<EventDetailResponse> showDetail(@PathVariable long eventId){
-		return ResponseEntity.ok(eventService.showDetail(eventId));
-	}
-	
 	// 이벤트 생성 페이지 (관리자 권한)
-	@PostMapping("/create")		// postman 테스트 성공 0417
+	@PostMapping("/new")		// postman 테스트 성공 0417
+	@Operation(summary = "작품 등록", description = "작품을 등록합니다")
+	@ApiResponse(responseCode="200", description="성공")
+	@ApiResponse(responseCode="400", description="에러")
 //	@Secured("ROLE_ADMIN") // 또는  @PreAuthorize("hasRole('ROLE_ADMIN')")
 	public ResponseEntity<CreateEventResponse> createEvent(@RequestBody CreateEventRequest request){
 		return ResponseEntity.ok(eventService.createEvent(request));
 	}
 	
-	@DeleteMapping("/delete/{eventId}")	// postman 테스트 성공 0418
+	
+	// 작품 소개
+	@GetMapping("/{eventId}")	// postman 테스트 성공 0417
+	@Operation(summary = "작품 상세정보", description = "해당 작품 정보를 조회합니다")
+	@ApiResponse(responseCode="200", description="성공")
+	@ApiResponse(responseCode="400", description="에러")
+	public ResponseEntity<EventDetailResponse> showDetail(@Parameter(description = "작품 id") @PathVariable Long eventId){
+		return ResponseEntity.ok(eventService.showDetail(eventId));
+	}
+	
 //	@Secured("ROLE_ADMIN")
-	public ResponseEntity<Boolean> deleteEvent(@PathVariable long eventId){
+	@DeleteMapping("/{eventId}")	// postman 테스트 성공 0418
+	@Operation(summary = "작품 삭제", description = "해당 작품을 삭제합니다")
+	@ApiResponse(responseCode="200", description="성공")
+	@ApiResponse(responseCode="400", description="에러")
+	public ResponseEntity<Boolean> deleteEvent(@Parameter(description = "작품 id") @PathVariable Long eventId){
 		return ResponseEntity.ok(eventService.deleteEventById(eventId));
 	}
 	

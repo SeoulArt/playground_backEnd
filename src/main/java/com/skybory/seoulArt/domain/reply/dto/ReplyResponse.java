@@ -8,7 +8,7 @@ import lombok.Setter;
 @Setter
 public class ReplyResponse {
 
-	private String nickname;
+	private String username;
 	private String replyComment;
 	private LocalDateTime replyDateTime;
 }

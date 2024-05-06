@@ -33,7 +33,7 @@ public class ReplyServiceImpl implements ReplyService {
 		Reply reply = new Reply();
 		reply.setUser(user);
 		reply.setReplyComment(request.getReplyComment());
-		reply.setNickname(request.getNickname());
+		reply.setUsername(request.getUsername());
 		reply.setReplyDateTime(LocalDateTime.now());
 		
 		// 3. 댓글 저장
@@ -41,7 +41,7 @@ public class ReplyServiceImpl implements ReplyService {
 		
 		// 4. dto 반환
 		ReplyResponse response = new ReplyResponse();
-		response.setNickname(request.getNickname());
+		response.setUsername(request.getUsername());
 		response.setReplyComment(request.getReplyComment());
 		response.setReplyDateTime(request.getReplyDateTime());
 		return response;
@@ -77,7 +77,7 @@ public class ReplyServiceImpl implements ReplyService {
 		                ReplyResponse response = new ReplyResponse();
 		                
 		                // 매핑
-		                response.setNickname(reply.getNickname());
+		                response.setUsername(reply.getUsername());
 		                response.setReplyComment(reply.getReplyComment());
 		                response.setReplyDateTime(reply.getReplyDateTime());
 		                return response;
@@ -91,7 +91,7 @@ public class ReplyServiceImpl implements ReplyService {
 		Reply reply = replyRepository.findById(replyId).orElseThrow(() -> new ServiceException(ErrorCode.ENTITY_NOT_FOUND));
 		ReplyResponse response = new ReplyResponse();
 		
-		response.setNickname(reply.getNickname());
+		response.setUsername(reply.getUsername());
 		response.setReplyComment(reply.getReplyComment());
 		response.setReplyDateTime(reply.getReplyDateTime());
 		

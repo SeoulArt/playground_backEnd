@@ -37,7 +37,7 @@ public class Reply {
 	
 	private String replyComment;
 	
-	private String nickname;
+	private String username;
 	
 	private LocalDateTime replyDateTime;
 	

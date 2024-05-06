@@ -21,7 +21,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class OAuthProvider {
 	RestTemplate restTemplate = new RestTemplate();
-	private final NaverProperties naverProperties;
+//	private final NaverProperties naverProperties;
 //	@Value("${spring.security.oauth2.client.registration.kakao.client-id}")
     private String kakaoClientId = "506825a69a9d9a83db0f7f1f8aaffe7d";
 
@@ -56,10 +56,12 @@ public class OAuthProvider {
             httpHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 //            httpHeaders.add("Content-Type", "application/x-www-form-urlencoded;charset=utf-8");
             
+            String clientId;
+            clientId = kakaoClientId;
 
             MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
             body.add("grant_type", "authorization_code");
-            body.add("client_id", kakaoClientId);
+            body.add("client_id", clientId);
             body.add("redirect_uri", kakaoRedirectUri);
             body.add("code", authorizationCode);
             body.add("client_secret", kakaoClientPw);

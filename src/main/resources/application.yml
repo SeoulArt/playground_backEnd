@@ -15,7 +15,7 @@ spring:
             scope: name,email,profile_image
                         
           kakao:
-            client-id: 506825a69a9d9a83db0f7f1f8aaffe7d # 앱키 -> REST API 키
+            client-id: "506825a69a9d9a83db0f7f1f8aaffe7d" # 앱키 -> REST API 키
             client-secret: Flejpx0RTQrq2fvNfbyENG0JWfFpqUwh # 카카오 로그인 -> 보안 -> Client Secret 코드
             authorization-grant-type: authorization_code
             redirect-uri: "http://localhost:5173/oauth/callback/kakao" # yml 파일에서 {} 가 spring 특수문자로 인식되게 하기 위해 " " 사용  이 부분 로컬 -> seoulart 로 바꿨음

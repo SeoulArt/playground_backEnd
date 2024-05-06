@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 public class CreateReplyRequest {
 	
-	private String nickname;
+	private String username;
 	private String replyComment;
 	private LocalDateTime replyDateTime;
 }

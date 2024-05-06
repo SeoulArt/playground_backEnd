@@ -3,6 +3,7 @@ package com.skybory.seoulArt.domain.seat.controller;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,6 +15,8 @@ import com.skybory.seoulArt.domain.seat.dto.CreateSeatRequest;
 import com.skybory.seoulArt.domain.seat.dto.CreateSeatResponse;
 import com.skybory.seoulArt.domain.seat.service.SeatService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -23,8 +26,11 @@ import lombok.RequiredArgsConstructor;
 public class SeatController {
 
 	private final SeatService seatService;
-	
+	@Secured("ROLE_ADMIN")
 	@PostMapping("/create")		// 포스트맨 테스트 완료 0417
+	@Operation(summary = "좌석 생성", description = "티켓 예약이 가능한 좌석을 생성합니다")
+	@ApiResponse(responseCode="200", description="성공")
+	@ApiResponse(responseCode="400", description="에러")
 	public ResponseEntity<List<CreateSeatResponse>> createSeats(@RequestBody CreateSeatRequest request){
 		// 좌석 생성
 //		seatService.createSeats(createSeatDTO);
@@ -32,6 +38,9 @@ public class SeatController {
 	}
 	
 	@DeleteMapping("delete/{seatIdx}")	// 포스트맨 테스트 완료 0417
+	@Operation(summary = "좌석 삭제", description = "좌석을 삭제합니다. delete on Cascade test 해봐야함")
+	@ApiResponse(responseCode="200", description="성공")
+	@ApiResponse(responseCode="400", description="에러")
 	public ResponseEntity<String> deleteSeat(@PathVariable long seatIdx) {
 		// 좌석 삭제
 		seatService.deleteSeat(seatIdx);
