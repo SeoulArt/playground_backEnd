@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,7 +19,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 //@CrossOrigin
 @RequiredArgsConstructor
-@RequestMapping("/user")
+@RequestMapping("/api/user")
 public class UserController {
 
 	private final UserService userService;
@@ -31,8 +32,14 @@ public class UserController {
 	
 	// 창작자 소개2
 	@GetMapping("/creators/{userId}")	// postman 완료(0417)
-	public ResponseEntity<CreatorDetailResponse> showCreatorDetail(@PathVariable long userId){
+	public ResponseEntity<CreatorDetailResponse> showCreatorDetail(@PathVariable Long userId){
 		return ResponseEntity.ok(userService.showCreatorDetail(userId));
+	}
+	
+	@DeleteMapping("/{userId}")	// postman 완료 (0506)
+	public ResponseEntity<?> delete(@PathVariable Long userId) {
+		userService.delete(userId);
+		return ResponseEntity.ok().build();
 	}
 	
 }

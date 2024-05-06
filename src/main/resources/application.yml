@@ -10,9 +10,9 @@ spring:
             client-name: naver
             client-id: EFSiWGS4Omrh4Tv4ZHgm
             client-secret: TpgP7auqTu
-            redirect-uri: http://seoulart.site/login/oauth2/code/naver
+            redirect-uri: "http://localhost:5173/oauth/callback/naver"
             authorization-grant-type: authorization_code
-            scope: name,email
+            scope: name,email,profile_image
                         
           kakao:
             client-id: 506825a69a9d9a83db0f7f1f8aaffe7d # 앱키 -> REST API 키

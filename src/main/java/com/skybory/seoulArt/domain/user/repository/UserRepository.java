@@ -1,11 +1,10 @@
-package com.skybory.seoulArt.domain.user;
+package com.skybory.seoulArt.domain.user.repository;
 
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 
-import com.skybory.seoulArt.domain.reply.entity.Reply;
+import com.skybory.seoulArt.domain.user.dto.UserDTO;
 import com.skybory.seoulArt.domain.user.entity.User;
 import com.skybory.seoulArt.global.Dept;
 
@@ -18,6 +17,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     List<User> findByDepartment(Dept department);
 
+	User findByVerifyCode(String verifyCode);
+	
+
+//	void save(Long userId);
+
 //	User findByUserId(String userId);
 
+   
 }

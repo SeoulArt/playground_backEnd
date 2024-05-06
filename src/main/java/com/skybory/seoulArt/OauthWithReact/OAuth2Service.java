@@ -19,10 +19,6 @@ public class OAuth2Service {
     private String kakaoRedirectUri;
     
     
-    String authorizeUrl = "https://nid.naver.com/oauth2.0/authorize";
-    String redirectUri = "https://www.seoulart.site/callback"; // 네이버로부터 리다이렉트 받을 URL
-    String state = "some_random_state_value"; // CSRF 공격 방지를 위한 상태 토큰
-    String scope = "profile email"; // 사용자 정보 요청 스코프
 
     
     public String buildAuthUrl(String provider) {
@@ -47,4 +43,5 @@ public class OAuth2Service {
         }
         
     }
+    
 }
