@@ -1,8 +1,12 @@
 package com.skybory.seoulArt.domain.event.service;
 
 import java.util.List;
+
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.skybory.seoulArt.domain.event.controller.EventController;
 import com.skybory.seoulArt.domain.event.dto.CreateEventRequest;
 import com.skybory.seoulArt.domain.event.dto.CreateEventResponse;
 import com.skybory.seoulArt.domain.event.entity.Event;
@@ -11,41 +15,75 @@ import com.skybory.seoulArt.domain.event.dto.EventDetailResponse;
 import com.skybory.seoulArt.global.exception.ErrorCode;
 import com.skybory.seoulArt.global.exception.ServiceException;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
 // 트랜잭션 리드온리 추가해야함
 @Service
 @Transactional(readOnly = true)
+@Log4j2
 @RequiredArgsConstructor
 public class EventServiceImpl implements EventService {
 
 	private final EventRepository eventRepository;
 
+//	@Override
+//	@Transactional
+//	public CreateEventResponse createEvent(CreateEventRequest request) {
+//
+//		// 1. validation 체크 해야할까?
+////    	validateEventDTO(request);
+//
+////        // 2. 새로운 이벤트 생성 및 매핑
+//		Event event = mapJoinDTOToUser(request);
+//
+//		// 3. DB에 이벤트 저장
+//		eventRepository.save(event);
+//
+//		// 4. response dto 생성 및 반환
+//		CreateEventResponse response = new CreateEventResponse();
+//
+//		// 5. dto에 값 미팽
+//		response.setEventDetail(request.getDetail());
+//		response.setEventImage(request.getImage());
+//		response.setEventTitle(request.getTitle());
+//
+//		// 6. 응답 반환
+//		return response;
+//	}
+	
 	@Override
 	@Transactional
 	public CreateEventResponse createEvent(CreateEventRequest request) {
-
-		// 1. validation 체크 해야할까?
-//    	validateEventDTO(request);
-
-//        // 2. 새로운 이벤트 생성 및 매핑
-		Event event = mapJoinDTOToUser(request);
-
-		// 3. DB에 이벤트 저장
-		eventRepository.save(event);
-
-		// 4. response dto 생성 및 반환
+		try {
+			validateEventDTO(request);
+			Event event = mapJoinDTOToUser(request);
+			eventRepository.save(event);
+		}
+			
+			catch (DataIntegrityViolationException e) {
+			    log.error("Data integrity violation on creating event: {}", e.getMessage());
+			    throw new ServiceException(ErrorCode.INVALID_INPUT_VALUE);
+			} catch (EntityNotFoundException e) {
+			    log.error("Entity not found when creating event: {}", e.getMessage());
+			    throw new ServiceException(ErrorCode.ENTITY_NOT_FOUND);
+			}
 		CreateEventResponse response = new CreateEventResponse();
-
-		// 5. dto에 값 미팽
 		response.setEventDetail(request.getDetail());
 		response.setEventImage(request.getImage());
 		response.setEventTitle(request.getTitle());
 
-		// 6. 응답 반환
 		return response;
 	}
-
+	
+	private void validateEventDTO(CreateEventRequest request) {
+	    // 여기에 유효성 검사 로직을 구현, 실패 시 IllegalArgumentException 던지기
+	    if (request.getDetail() == null || request.getImage() == null || request.getTitle() == null) {
+	        throw new IllegalArgumentException("Event detail, image, and title must not be null");
+	    }
+	}
+		
 	// 매핑 메서드
 	private Event mapJoinDTOToUser(CreateEventRequest registerEventDTO) {
 		Event event = new Event();

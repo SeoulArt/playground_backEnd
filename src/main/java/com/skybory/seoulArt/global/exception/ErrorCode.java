@@ -1,5 +1,8 @@
 package com.skybory.seoulArt.global.exception;
 
+import lombok.Getter;
+
+@Getter
 public enum ErrorCode {
 	
 	// Common

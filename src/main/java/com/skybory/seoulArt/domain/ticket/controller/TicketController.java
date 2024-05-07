@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.skybory.seoulArt.domain.event.controller.EventController;
 import com.skybory.seoulArt.domain.ticket.dto.CreateTicketRequest;
 import com.skybory.seoulArt.domain.ticket.dto.CreateTicketResponse;
 import com.skybory.seoulArt.domain.ticket.dto.TicketDetailResponse;
@@ -17,9 +19,11 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
 @RestController
 //@CrossOrigin(origins = "http://localhost:5174")
+@Log4j2
 @RequiredArgsConstructor // 생성자 생성(의존성주입)
 @RequestMapping("/api/ticket")
 public class TicketController {

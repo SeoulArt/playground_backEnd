@@ -2,32 +2,27 @@ package com.skybory.seoulArt.domain.event.controller;
 
 import org.springframework.http.ResponseEntity;
 
-import org.springframework.ui.Model;
-//import org.springframework.security.access.annotation.Secured;
-import org.springframework.web.bind.annotation.CrossOrigin;
+
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.skybory.seoulArt.domain.event.dto.CreateEventRequest;
-import com.skybory.seoulArt.domain.event.entity.Event;
 import com.skybory.seoulArt.domain.event.service.EventService;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-
 import com.skybory.seoulArt.domain.event.dto.CreateEventResponse;
 import com.skybory.seoulArt.domain.event.dto.EventDetailResponse;
-
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
 @RestController
 //@CrossOrigin(origins = "http://reactserver")
+@Log4j2
 @RequiredArgsConstructor
 @RequestMapping("/api/event")	// 나중에 /thymeleaf 부분만 제거해야함.
 public class EventController {
@@ -41,6 +36,9 @@ public class EventController {
 	@ApiResponse(responseCode="400", description="에러")
 //	@Secured("ROLE_ADMIN") // 또는  @PreAuthorize("hasRole('ROLE_ADMIN')")
 	public ResponseEntity<CreateEventResponse> createEvent(@RequestBody CreateEventRequest request){
+		log.info("Creating new event with request: {}", request); 
+		CreateEventResponse response = eventService.createEvent(request);
+		log.info("Event created successfully with response: {}", response);
 		return ResponseEntity.ok(eventService.createEvent(request));
 	}
 	

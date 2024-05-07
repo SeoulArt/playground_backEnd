@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.skybory.seoulArt.domain.event.controller.EventController;
 import com.skybory.seoulArt.domain.seat.dto.CreateSeatRequest;
 import com.skybory.seoulArt.domain.seat.dto.CreateSeatResponse;
 import com.skybory.seoulArt.domain.seat.service.SeatService;
@@ -18,9 +20,11 @@ import com.skybory.seoulArt.domain.seat.service.SeatService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
 @RestController
 //@CrossOrigin(origins = "http://reactserver")
+@Log4j2
 @RequiredArgsConstructor
 @RequestMapping("/api/seat")
 public class SeatController {

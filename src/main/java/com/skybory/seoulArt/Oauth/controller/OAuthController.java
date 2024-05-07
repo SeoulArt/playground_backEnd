@@ -25,13 +25,16 @@ import com.skybory.seoulArt.Oauth.dto.NaverMemberResponse;
 import com.skybory.seoulArt.Oauth.dto.RefreshTokenRequest;
 import com.skybory.seoulArt.Oauth.dto.UrlResponse;
 import com.skybory.seoulArt.Oauth.service.OAuth2Service;
+import com.skybory.seoulArt.domain.event.controller.EventController;
 import com.skybory.seoulArt.domain.user.dto.UserDTO;
 import com.skybory.seoulArt.domain.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
 @RestController
+@Log4j2
 @RequiredArgsConstructor
 @RequestMapping("/api/auth")
 public class OAuthController {
