@@ -15,8 +15,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
+
+import com.skybory.seoulArt.Oauth.JwtUtil;
 import com.skybory.seoulArt.Oauth.OAuthProvider;
 import com.skybory.seoulArt.Oauth.dto.AccessTokenResponse;
 import com.skybory.seoulArt.Oauth.dto.KakaoMemberResponse;
@@ -39,6 +42,8 @@ import lombok.extern.log4j.Log4j2;
 @RequestMapping("/api/auth")
 public class OAuthController {
 
+    @Autowired
+    private JwtUtil jwtUtil;
 //	private final RestTemplate restTemplate = new RestTemplate();
 //	private final NaverProperties naverProperties = new NaverProperties();
 //	OAuthProvider provider = new OAuthProvider(naverProperties);
@@ -53,7 +58,7 @@ public class OAuthController {
 //	private CustomOAuth2UserService customOAuth2UserService;
 
 
-	@GetMapping("/{provider}/login-url") // 클라이언트로부터 GET 요청을 받음
+	@GetMapping("/{provider}/url") // 클라이언트로부터 GET 요청을 받음		-> provider 삭제
 	@Operation(summary = "로그인 url 요청", description = "카카오, 또는 네이버 로그인 url을 요청합니다")
 	@ApiResponse(responseCode = "200", description = "요청 성공")
 	@ApiResponse(responseCode = "400", description = "요청 실패")
@@ -88,10 +93,10 @@ public class OAuthController {
 //		return ResponseEntity.ok(userService.login(kakaoMemberResponse));
 //	}
 
-	@Operation(summary = "통합 로그인", description = "카카오 또는 네아버 회원 정보를 가져옵니다")
+	@Operation(summary = "통합 로그인", description = "카카오 또는 네이버 회원 정보를 가져옵니다")
 	@ApiResponse(responseCode = "200", description = "요청 성공")
 	@ApiResponse(responseCode = "400", description = "요청 실패")
-	@PostMapping("/{domain}/login")
+//	@PostMapping("/{domain}/login")
 	public ResponseEntity<UserDTO> kakaoLogin(@RequestBody LoginRequest request, @PathVariable("domain") String domain)
 			throws Exception {
 
@@ -124,8 +129,8 @@ public class OAuthController {
 		}
 		else return null;
 	}
- 
-	@PostMapping("refresh/token/{domain}")
+	
+	@PostMapping("refresh/{domain}")			// api auth logout (delete)
 	@Operation(summary = "토큰 갱신하기", description = "토큰을 갱신합니다")
 	@ApiResponse(responseCode = "200", description = "요청 성공")
 	@ApiResponse(responseCode = "400", description = "요청 실패")
@@ -133,7 +138,68 @@ public class OAuthController {
 
 		return ResponseEntity.ok(provider.refreshToken(request));
 	}
+	
+	
+	@GetMapping("/generate-token")
+    public String generateToken(@RequestParam Long userId) {
+        return jwtUtil.generateToken(userId);
+    }
 
+	@GetMapping("/validate-token")
+	public boolean validateToken(@RequestParam String token) {
+		return jwtUtil.validateToken(token);
+	}
+	
+	// 카카오 로그인
+	@Operation(summary = "카카오 로그인", description = "카카오 회원 정보를 가져옵니다")
+	@ApiResponse(responseCode = "200", description = "요청 성공")
+	@ApiResponse(responseCode = "400", description = "요청 실패")
+	@PostMapping("/kakao/login")
+	public ResponseEntity<UserDTO> kakaoLogin(@RequestBody LoginRequest request) throws Exception {
+		// 인가코드 받기
+	    String code = request.getCode();
+	    // 카카오가 엑세스 토큰을 발급받음
+	    AccessTokenResponse accessTokenResponse = provider.getKakaoAccessToken(code);
+	    System.out.println("카카오 토큰 받아오기 성공");
+	    String accessToken = accessTokenResponse.getAccess_token();
+	    // 카카오 멤버 정보 반환
+	    KakaoMemberResponse kakaoMemberResponse = provider.getMemberInfo(accessToken);
+	    System.out.println("회원 정보 받아오기 성공");
+
+	    // 유저 DTO에 카카오 멤버 정보 매핑
+	    UserDTO user = userService.login(kakaoMemberResponse);
+	    // JWT 토큰 생성(회원 이름으로 토큰 생성) -> 이 부부늘 수정할까
+	    String token = jwtUtil.generateToken(user.getUserId());
+
+	    // 헤더에 JWT 토큰 추가
+	    HttpHeaders headers = new HttpHeaders();
+	    headers.add("Authorization", "Bearer " + token);
+
+	    return ResponseEntity.ok().headers(headers).body(user);
+	}
+	
+	// 네이버 로그인 메서드
+	@Operation(summary = "네이버 로그인", description = "네이버 회원 정보를 가져옵니다")
+	@ApiResponse(responseCode = "200", description = "요청 성공")
+	@ApiResponse(responseCode = "400", description = "요청 실패")
+	@PostMapping("/naver/login")
+	public ResponseEntity<UserDTO> naverLogin(@RequestBody LoginRequest request) throws Exception {
+	    String code = request.getCode();
+	    AccessTokenResponse accessTokenResponse = provider.getNaverAccessTokenV2(code);
+	    String accessToken = accessTokenResponse.getAccess_token();
+	    NaverMemberResponse naverMemberResponse = provider.getNaverInfo(accessToken);
+
+	    UserDTO user = userService.login(naverMemberResponse);
+	    String token = jwtUtil.generateToken(user.getUserId());
+
+	    HttpHeaders headers = new HttpHeaders();
+	    headers.add("Authorization", "Bearer " + token);
+
+	    return ResponseEntity.ok().headers(headers).body(user);
+	}
+	
+	
+	
 }
 
 

@@ -11,9 +11,9 @@ public class CreateTicketRequest {
 	
 //	private long ticketIdx; 
 
-	private long eventIdx;
+	private Long eventIdx;	// 몇번 공연을 예매할건지
 
-	private long userIdx;
+	private Long userIdx;	// 누가 예매할건지
 
 //	private long seatIdx;
 

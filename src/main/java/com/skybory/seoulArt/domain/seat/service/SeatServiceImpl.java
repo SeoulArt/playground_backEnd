@@ -26,21 +26,22 @@ public class SeatServiceImpl implements SeatService {
 		
 		// 좌석 생성하기
 		int amount = request.getAmount();
-		long eventId = request.getEventId();
+//		long eventId = request.getEventId();
 		List<Seat> seatList = new ArrayList<>();
 
 		// 1~3번 이벤트까지 한번에 생성
-//		for (int j = 1; j <= 3; j++) {
+		for (Long j = 1L; j <= 3; j++) {
 			
-			for(long i=1; i<=amount; i++) {
+			for(Long i=1L; i<=amount; i++) {
 			Seat seat = new Seat();
 					seat.setSeatStatus(SeatStatus.AVAILABLE);
 //					seat.setSeatIdx(i);
-					seat.setEventIdx(request.getEventId());
+//					seat.setEventIdx(request.getEventId());
+					seat.setEventIdx(j);
 					seatList.add(seat);
 //					seatRepository.save(seat);
 				}
-//		}
+		}
 		seatRepository.saveAll(seatList);
 
 		// DTO로 옮겨담기
@@ -48,7 +49,8 @@ public class SeatServiceImpl implements SeatService {
 				.map(seat -> {
 					CreateSeatResponse response = new CreateSeatResponse();
 					// 매핑
-					response.setEventId(eventId);
+//					response.setEventId(eventId);
+					response.setEventId(seat.getEventIdx());
 					response.setSeatId(seat.getSeatIdx());
 					return response;
 				})

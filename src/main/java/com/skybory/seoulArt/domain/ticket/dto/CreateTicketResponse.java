@@ -11,10 +11,10 @@ public class CreateTicketResponse {
 	
 //	private long ticketIdx;
 	
-	private long eventIdx;
+	private Long eventIdx;
 
-	private long userIdx;
+	private Long userIdx;
 	
-	private long seatIdx;
+	private Long seatIdx;
 	
 }

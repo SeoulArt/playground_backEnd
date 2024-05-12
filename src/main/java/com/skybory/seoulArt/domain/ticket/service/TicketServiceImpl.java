@@ -2,7 +2,6 @@ package com.skybory.seoulArt.domain.ticket.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.skybory.seoulArt.domain.event.entity.Event;
 import com.skybory.seoulArt.domain.event.repository.EventRepository;
 import com.skybory.seoulArt.domain.seat.entity.Seat;
@@ -65,16 +64,29 @@ public class TicketServiceImpl implements TicketService {
 //		return ticketRepository.save(ticket);
 //	}
 
-	@Override
+	@Override	// 0508 주석처리
 	@Transactional 
 	public CreateTicketResponse create(CreateTicketRequest request) {
+		
+		// request validation check
+		User user = userRepository.findById(request.getUserIdx()).orElseThrow(() -> new ServiceException(ErrorCode.USER_NOT_FOUND));
+		eventRepository.findById(request.getEventIdx()).orElseThrow(() -> new ServiceException(ErrorCode.EVENT_NOT_FOUND));
+		
+		
+		if (user.getTicket() != null ) {
+			throw new ServiceException(ErrorCode.DUPLICATE_TICKET);
+		}
+		
 		// 빈 자리 확인(boolean), 빈자리 없을시 오류 던짐
 		hasAvailableSeats(request.getEventIdx());
-		long seatIdx = 0;
+		
+		
+		
+		Long seatIdx = 0L;
 		// eventIdx == request.getEventIdx() 인, 자리 중에 빈 자리 하나(seatIdx가 낮은 순서부터) 예약중으로 바꿔야함.
-		if (request.getEventIdx()==1) {
-			for(long i = 1; i<50; i++) {
-			Seat seat =	seatRepository.findById(i).orElseThrow();
+		if (request.getEventIdx()==1L) {
+			for(Long i = 1L; i<50; i++) {
+			Seat seat =	seatRepository.findById(i).orElseThrow(() -> new ServiceException(ErrorCode.SEAT_NOT_FOUND));
 	       
 			if (seat.getSeatStatus() == SeatStatus.AVAILABLE) {
 	            seat.setSeatStatus(SeatStatus.RESERVING);
@@ -84,11 +96,11 @@ public class TicketServiceImpl implements TicketService {
 			}
 		}
 		
-		if (request.getEventIdx()==2) {
+		if (request.getEventIdx()==2L) {
 			
 		}
 		
-		if (request.getEventIdx()==3) {
+		if (request.getEventIdx()==3L) {
 			
 		}
 		
@@ -108,6 +120,11 @@ public class TicketServiceImpl implements TicketService {
 	}
 	
 
+ 
+	
+	
+	
+	
 	// 공연 취소하기
 	@Override
 	@Transactional

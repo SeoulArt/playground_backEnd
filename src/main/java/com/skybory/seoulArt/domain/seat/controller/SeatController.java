@@ -29,9 +29,11 @@ import lombok.extern.log4j.Log4j2;
 @RequestMapping("/api/seat")
 public class SeatController {
 
+	// 이거 자체를 지우자
+	
 	private final SeatService seatService;
 	@Secured("ROLE_ADMIN")
-	@PostMapping("/create")		// 포스트맨 테스트 완료 0417
+	@PostMapping("")		// 포스트맨 테스트 완료 0417
 	@Operation(summary = "좌석 생성", description = "티켓 예약이 가능한 좌석을 생성합니다")
 	@ApiResponse(responseCode="200", description="성공")
 	@ApiResponse(responseCode="400", description="에러")
@@ -41,7 +43,7 @@ public class SeatController {
 		return ResponseEntity.ok(seatService.createSeats(request));
 	}
 	
-	@DeleteMapping("delete/{seatIdx}")	// 포스트맨 테스트 완료 0417
+	@DeleteMapping("/{seatIdx}")	// 포스트맨 테스트 완료 0417
 	@Operation(summary = "좌석 삭제", description = "좌석을 삭제합니다. delete on Cascade test 해봐야함")
 	@ApiResponse(responseCode="200", description="성공")
 	@ApiResponse(responseCode="400", description="에러")

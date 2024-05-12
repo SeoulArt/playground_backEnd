@@ -7,6 +7,7 @@ import com.skybory.seoulArt.domain.event.dto.CreateEventRequest;
 import com.skybory.seoulArt.domain.event.dto.CreateEventResponse;
 import com.skybory.seoulArt.domain.event.entity.Event;
 import com.skybory.seoulArt.domain.event.dto.EventDetailResponse;
+import com.skybory.seoulArt.domain.event.dto.EventEditRequest;
 
 
 public interface EventService {
@@ -23,5 +24,7 @@ public interface EventService {
 	// 이벤트 삭제
 	boolean deleteEventById(Long eventIdx);
 
-	EventDetailResponse showDetail(long eventId);
+	EventDetailResponse showDetail(Long eventId);
+	
+	EventDetailResponse editEvent(Long eventId, EventEditRequest request);
 }

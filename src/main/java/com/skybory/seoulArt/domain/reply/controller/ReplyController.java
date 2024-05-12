@@ -28,7 +28,7 @@ public class ReplyController {
 
 	private final ReplyService replyService;
 
-	@GetMapping("/main")
+	@GetMapping("")
 	@Operation(summary = "댓글 목록 조회", description = "모든 댓글 목록을 조회합니다")
 	@ApiResponse(responseCode="200", description="성공")
 	@ApiResponse(responseCode="400", description="에러")
@@ -37,7 +37,7 @@ public class ReplyController {
 	}
 
 	
-	@PostMapping("/create")
+	@PostMapping("")
 	@Operation(summary = "댓글 생성", description = "댓글을 생성합니다")
 	@ApiResponse(responseCode="200", description="성공")
 	@ApiResponse(responseCode="400", description="에러")
@@ -46,7 +46,7 @@ public class ReplyController {
 	}
 	
 	// of 메서드는 어떤걸까..
-	@GetMapping("/detail/{replyIdx}")
+	@GetMapping("/{replyIdx}")
 	@Operation(summary = "댓글 상세정보 조회", description = "댓글의 상세정보를 조회합니다")
 	@ApiResponse(responseCode="200", description="성공")
 	@ApiResponse(responseCode="400", description="에러")
@@ -54,7 +54,7 @@ public class ReplyController {
 		return ResponseEntity.of(replyService.showDetail(replyIdx));
 	}
 	
-	@DeleteMapping("/delete/{replyIdx}")
+	@DeleteMapping("/{replyIdx}")
 	@Operation(summary = "댓글 삭제", description = "댓글을 삭제합니다")
 	@ApiResponse(responseCode="200", description="성공")
 	@ApiResponse(responseCode="400", description="에러")

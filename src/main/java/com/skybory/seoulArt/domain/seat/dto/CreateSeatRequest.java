@@ -8,5 +8,4 @@ import lombok.Setter;
 public class CreateSeatRequest {
 
 	private int amount;
-	private long eventId;
 }

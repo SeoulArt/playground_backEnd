@@ -37,19 +37,21 @@ public class UserController {
 	@ApiResponse(responseCode="200", description="성공")
 	@ApiResponse(responseCode="400", description="에러")
 	public ResponseEntity<List<CreatorDetailResponse>> showCreatorList(){
+		log.info("창작자 불러오기");
 		return ResponseEntity.ok(userService.showCreatorList());
 	}
 	
 	// 창작자 소개2
-	@GetMapping("/creators/{userId}")	// postman 완료(0417)
+	@GetMapping("/creator/{userId}")	// postman 완료(0417)
 	@Operation(summary = "창작자 세부 조회", description = "해당 창작자의 세부사항을 조회합니다")
 	@ApiResponse(responseCode="200", description="성공")
 	@ApiResponse(responseCode="400", description="에러" )
 	public ResponseEntity<CreatorDetailResponse> showCreatorDetail(@Parameter(description = "유저 id") @PathVariable Long userId){
+		log.info("창작자 세부 조회");
 		return ResponseEntity.ok(userService.showCreatorDetail(userId));
 	}
 	
-	@DeleteMapping("/{userId}")	// postman 완료 (0506)
+	@DeleteMapping("/{userId}")	// postman 완료 (0506)	//회원 탈퇴로 변경해서 authController . withdraw
 	@Operation(summary = "유저 삭제", description = "해당 유저를 삭제합니다")
 	@ApiResponse(responseCode="200", description="성공")
 	@ApiResponse(responseCode="400", description="에러")

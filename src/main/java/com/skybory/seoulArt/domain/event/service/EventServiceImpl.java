@@ -12,6 +12,7 @@ import com.skybory.seoulArt.domain.event.dto.CreateEventResponse;
 import com.skybory.seoulArt.domain.event.entity.Event;
 import com.skybory.seoulArt.domain.event.repository.EventRepository;
 import com.skybory.seoulArt.domain.event.dto.EventDetailResponse;
+import com.skybory.seoulArt.domain.event.dto.EventEditRequest;
 import com.skybory.seoulArt.global.exception.ErrorCode;
 import com.skybory.seoulArt.global.exception.ServiceException;
 
@@ -116,13 +117,31 @@ public class EventServiceImpl implements EventService {
 	}
 
 	@Override
-	public EventDetailResponse showDetail(long eventId) {
+	public EventDetailResponse showDetail(Long eventId) {
 		// 이벤트 찾기
 		Event event = eventRepository.findById(eventId)
 				.orElseThrow(() -> new ServiceException(ErrorCode.EVENT_NOT_FOUND));
 		// 정보 가져오기 및 반환하기
 		EventDetailResponse response = new EventDetailResponse();
 		response.setEventIdx(event.getEventIdx());
+		response.setTitle(event.getTitle());
+		response.setDetail(event.getDetail());
+		response.setImage(event.getImage());
+		return response;
+	}
+
+
+	@Override
+	public EventDetailResponse editEvent(Long eventId, EventEditRequest request) {
+		Event event = eventRepository.findById(eventId)
+				.orElseThrow(() -> new ServiceException(ErrorCode.EVENT_NOT_FOUND));
+		
+		event.setTitle(request.getEventTitle());
+		event.setDetail(request.getEventDetail());
+		event.setImage(request.getEventImage());
+		
+		
+		EventDetailResponse response = new EventDetailResponse();
 		response.setTitle(event.getTitle());
 		response.setDetail(event.getDetail());
 		response.setImage(event.getImage());

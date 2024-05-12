@@ -53,12 +53,10 @@ public class OAuthProvider {
             httpHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 //            httpHeaders.add("Content-Type", "application/x-www-form-urlencoded;charset=utf-8");
             
-            String clientId;
-            clientId = kakaoClientId;
 
             MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
             body.add("grant_type", "authorization_code");
-            body.add("client_id", clientId);
+            body.add("client_id", kakaoClientId);
             body.add("redirect_uri", kakaoRedirectUri);
             body.add("code", authorizationCode);
             body.add("client_secret", kakaoClientPw);
