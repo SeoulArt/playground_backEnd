@@ -1,10 +1,12 @@
 package com.skybory.seoulArt.domain.event.service;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.skybory.seoulArt.domain.event.controller.EventController;
 import com.skybory.seoulArt.domain.event.dto.CreateEventRequest;
@@ -13,6 +15,7 @@ import com.skybory.seoulArt.domain.event.entity.Event;
 import com.skybory.seoulArt.domain.event.repository.EventRepository;
 import com.skybory.seoulArt.domain.event.dto.EventDetailResponse;
 import com.skybory.seoulArt.domain.event.dto.EventEditRequest;
+import com.skybory.seoulArt.global.FileUploadService;
 import com.skybory.seoulArt.global.exception.ErrorCode;
 import com.skybory.seoulArt.global.exception.ServiceException;
 
@@ -28,6 +31,7 @@ import lombok.extern.log4j.Log4j2;
 public class EventServiceImpl implements EventService {
 
 	private final EventRepository eventRepository;
+	private final FileUploadService fileUploadService;  // FileUploadService 주입
 
 //	@Override
 //	@Transactional
@@ -77,6 +81,41 @@ public class EventServiceImpl implements EventService {
 
 		return response;
 	}
+//	@Override
+//	@Transactional
+//	public CreateEventResponse createEvent(CreateEventRequest request) {
+//	    try {
+//	        validateEventDTO(request);
+//	        MultipartFile imageFile = request.getImageFile();
+//	        
+//	        if (imageFile != null && !imageFile.isEmpty()) {
+//	            String fileName = "events/" + System.currentTimeMillis() + "_" + imageFile.getOriginalFilename();
+//	            String imageUrl = fileUploadService.uploadFile(imageFile, fileName);
+//	            request.setImage(imageUrl);  // 업로드된 이미지 URL을 request의 image 필드에 저장
+//	        }
+//
+//	        Event event = mapJoinDTOToUser(request);
+//	        event.setImage(request.getImage());  // Event 엔티티에 이미지 URL을 저장
+//	        eventRepository.save(event);
+//
+//	    } catch (DataIntegrityViolationException e) {
+//	        log.error("Data integrity violation on creating event: {}", e.getMessage());
+//	        throw new ServiceException(ErrorCode.INVALID_INPUT_VALUE);
+//	    } catch (EntityNotFoundException e) {
+//	        log.error("Entity not found when creating event: {}", e.getMessage());
+//	        throw new ServiceException(ErrorCode.ENTITY_NOT_FOUND);
+//	    } catch (IOException e) {
+//	        log.error("Error uploading image to S3: {}", e.getMessage());
+//	        throw new RuntimeException("Error uploading image", e);
+//	    }
+//
+//	    CreateEventResponse response = new CreateEventResponse();
+//	    response.setEventDetail(request.getDetail());
+//	    response.setEventImage(request.getImage());  // 응답에 업로드된 이미지의 URL 포함
+//	    response.setEventTitle(request.getTitle());
+//
+//	    return response;
+//	}
 	
 	private void validateEventDTO(CreateEventRequest request) {
 	    // 여기에 유효성 검사 로직을 구현, 실패 시 IllegalArgumentException 던지기
@@ -132,6 +171,7 @@ public class EventServiceImpl implements EventService {
 
 
 	@Override
+	@Transactional
 	public EventDetailResponse editEvent(Long eventId, EventEditRequest request) {
 		Event event = eventRepository.findById(eventId)
 				.orElseThrow(() -> new ServiceException(ErrorCode.EVENT_NOT_FOUND));

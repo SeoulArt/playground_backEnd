@@ -3,6 +3,7 @@ package com.skybory.seoulArt.domain.reply.controller;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -55,6 +56,7 @@ public class ReplyController {
 	}
 	
 	@DeleteMapping("/{replyIdx}")
+//	@Secured("ROLE_USER")
 	@Operation(summary = "댓글 삭제", description = "댓글을 삭제합니다")
 	@ApiResponse(responseCode="200", description="성공")
 	@ApiResponse(responseCode="400", description="에러")

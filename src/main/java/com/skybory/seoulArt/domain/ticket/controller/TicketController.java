@@ -70,12 +70,14 @@ public class TicketController {
 	}
 	
 	// '예약확인'
-	@GetMapping("/{userId}")	// 포스트맨 성공 0418.	-> ticketId
+	@GetMapping("")	// 포스트맨 성공 0418.	-> ticketId
 	@Operation(summary = "예매 확인", description = "해당 유저의 티켓을 조회합니다")
 	@ApiResponse(responseCode="200", description="성공")
 	@ApiResponse(responseCode="400", description="에러")
-	public ResponseEntity<TicketDetailResponse> find(@Parameter(description = "유저 id")@PathVariable Long userId) {
-		return ResponseEntity.ok(ticketService.findTicket(userId));
+	public ResponseEntity<TicketDetailResponse> find(HttpServletRequest request) {
+		log.info("예약 확인");
+		UserDTO user = userService.getCurrentUser(request);
+		return ResponseEntity.ok(ticketService.findTicket(user.getUserId()));
 	}
 	
 	// 하나만 조회하는건 /{ticketId}

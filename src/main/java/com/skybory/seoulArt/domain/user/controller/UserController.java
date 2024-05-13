@@ -51,8 +51,8 @@ public class UserController {
 		return ResponseEntity.ok(userService.showCreatorDetail(userId));
 	}
 	
-	@DeleteMapping("/{userId}")	// postman 완료 (0506)	//회원 탈퇴로 변경해서 authController . withdraw
-	@Operation(summary = "유저 삭제", description = "해당 유저를 삭제합니다")
+//	@DeleteMapping("/{userId}")	// postman 완료 (0506)	//회원 탈퇴로 변경해서 authController . withdraw
+	@Operation(summary = "회원 탈퇴", description = "해당 유저를 삭제합니다")
 	@ApiResponse(responseCode="200", description="성공")
 	@ApiResponse(responseCode="400", description="에러")
 	public ResponseEntity<?> delete(@Parameter(description = "창작자 id") @PathVariable Long userId) {

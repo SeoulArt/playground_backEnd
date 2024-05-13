@@ -59,7 +59,11 @@ public enum ErrorCode {
 //
     //FOLLOW
     	FOLLOW_NOT_FOUND(400, "F001", "팔로우 정보가 없습니다."),
-    	SAME_ID_DENIED(400, "F002", "자기 자신을 팔로우할 순 없습니다.");
+    	SAME_ID_DENIED(400, "F002", "자기 자신을 팔로우할 순 없습니다."), 
+    	
+    	
+    	// 토큰
+    	INVALID_TOKEN(401, "A001", "유효하지 않은 토큰입니다");
 
     private final int status;
     private final String code;
