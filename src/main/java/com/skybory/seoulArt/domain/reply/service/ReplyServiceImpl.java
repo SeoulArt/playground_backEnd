@@ -1,51 +1,54 @@
 package com.skybory.seoulArt.domain.reply.service;
 
 import java.time.LocalDateTime;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
+
+import com.skybory.seoulArt.domain.event.controller.EventController;
 import com.skybory.seoulArt.domain.reply.dto.CreateReplyRequest;
 import com.skybory.seoulArt.domain.reply.dto.ReplyResponse;
 import com.skybory.seoulArt.domain.reply.entity.Reply;
 import com.skybory.seoulArt.domain.reply.repository.ReplyRepository;
 import com.skybory.seoulArt.domain.user.entity.User;
-import com.skybory.seoulArt.global.SessionConst;
 import com.skybory.seoulArt.global.exception.ErrorCode;
 import com.skybory.seoulArt.global.exception.ServiceException;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
 @Service
 @RequiredArgsConstructor
+@Log4j2
 public class ReplyServiceImpl implements ReplyService {
 
 	private final ReplyRepository replyRepository;
-	private final HttpSession session;
+//	private final HttpSession session;
  
-	public ReplyResponse createReply(CreateReplyRequest request) {
-		// 1. 유효성 검사?
-
-		// 2. 매핑
-		User user = (User) session.getAttribute(SessionConst.LOGIN_MEMBER);
-		Reply reply = new Reply();
-		reply.setUser(user);
-		reply.setReplyComment(request.getReplyComment());
-		reply.setUsername(request.getUsername());
-		reply.setReplyDateTime(LocalDateTime.now());
-		
-		// 3. 댓글 저장
-		replyRepository.save(reply);
-		
-		// 4. dto 반환
-		ReplyResponse response = new ReplyResponse();
-		response.setUsername(request.getUsername());
-		response.setReplyComment(request.getReplyComment());
-		response.setReplyDateTime(request.getReplyDateTime());
-		return response;
-	}
+	// 0514 잠깐 막아둠
+//	public ReplyResponse createReply(CreateReplyRequest request) {
+//		// 1. 유효성 검사?
+//
+//		// 2. 매핑
+//		User user = (User) session.getAttribute(SessionConst.LOGIN_MEMBER);
+//		Reply reply = new Reply();
+//		reply.setUser(user);
+//		reply.setReplyComment(request.getReplyComment());
+//		reply.setUsername(request.getUsername());
+//		reply.setReplyDateTime(LocalDateTime.now());
+//		
+//		// 3. 댓글 저장
+//		replyRepository.save(reply);
+//		
+//		// 4. dto 반환
+//		ReplyResponse response = new ReplyResponse();
+//		response.setUsername(request.getUsername());
+//		response.setReplyComment(request.getReplyComment());
+//		response.setReplyDateTime(request.getReplyDateTime());
+//		return response;
+//	}
 	
 	@Override
 	public boolean deleteReply(long replyIdx) {
@@ -96,6 +99,11 @@ public class ReplyServiceImpl implements ReplyService {
 		response.setReplyDateTime(reply.getReplyDateTime());
 		
 		return Optional.of(response);
+	}
+	@Override
+	public ReplyResponse createReply(CreateReplyRequest replydto) {
+		// TODO Auto-generated method stub
+		return null;
 	}
  
 }

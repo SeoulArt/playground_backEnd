@@ -1,7 +1,8 @@
 package com.skybory.seoulArt.domain.ticket.controller;
 
 import org.springframework.http.HttpRequest;
-import org.springframework.http.ResponseEntity; 
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -38,6 +39,7 @@ public class TicketController {
 	
 	// '예약하기 버튼' 누를 때 -> 예매완료 화면으로 이동.
 	@PostMapping("")	// 포스트맨 성공 0417. 그러나 추가적인 에러 테스트가 필요해보임( 제일 중요한 로직 )
+	@Secured({"ROLE_USER", "ROLE_ADMIN"})
 	@Operation(summary = "티켓 예매하기", description = "티켓을 예매합니다")
 	@ApiResponse(responseCode="200", description="성공")
 	@ApiResponse(responseCode="400", description="커스텀 에러 발생", content = @Content(schema = @Schema(implementation = ApiError.class)))

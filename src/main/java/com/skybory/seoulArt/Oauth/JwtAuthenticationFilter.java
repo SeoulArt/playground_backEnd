@@ -6,6 +6,7 @@ import java.util.Collections;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -70,7 +71,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 				}
 			} else {
 				log.info("validateToken 값이 false 입니다");
-				response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "No JWT token found");
+//				throw new AccessDeniedException("ValidateToken 값이 유효하지 않습니다");
+//				response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "No JWT token found");
+//				return;
 			}
 		} else {
 			log.info("JWT 가져오기 실패");

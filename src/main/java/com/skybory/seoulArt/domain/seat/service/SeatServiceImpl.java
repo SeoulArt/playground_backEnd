@@ -30,7 +30,7 @@ public class SeatServiceImpl implements SeatService {
 		List<Seat> seatList = new ArrayList<>();
 
 		// 1~3번 이벤트까지 한번에 생성
-		for (Long j = 1L; j <= 3; j++) {
+		for (Long j = 1L; j <= 6; j++) {
 			
 			for(Long i=1L; i<=amount; i++) {
 			Seat seat = new Seat();

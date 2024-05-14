@@ -69,3 +69,6 @@ server:
       charset: UTF-8
       enabled: true
       force: true
+      
+seoulArt:
+  secret-key: "THISISSKYBORYYUMYUMDEVELOPINGTHANKYOU"

@@ -1,5 +1,6 @@
 package com.skybory.seoulArt.Oauth;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -18,32 +19,58 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class OAuthProvider {
 	RestTemplate restTemplate = new RestTemplate();
-//	private final NaverProperties naverProperties;
-//	@Value("${spring.security.oauth2.client.registration.kakao.client-id}")
-    private String kakaoClientId = "506825a69a9d9a83db0f7f1f8aaffe7d";
+	
+//    private String kakaoClientId = "506825a69a9d9a83db0f7f1f8aaffe7d";
+//
+//    private String kakaoClientPw = "Flejpx0RTQrq2fvNfbyENG0JWfFpqUwh";
+//
+//    private String kakaoRedirectUri = "http://localhost:5173/oauth/callback/kakao";
+//    
+//    private String userUri = "https://kapi.kakao.com/v2/user/me";
+//    
+//    private String tokenUri = "https://kauth.kakao.com/oauth/token";
+//    
+//    private String naverClientId = "EFSiWGS4Omrh4Tv4ZHgm";
+//    
+//    private String naverClientPw = "TpgP7auqTu";
+//    
+//    private String naverRedirectUri = "http://localhost:5173/oauth/callback/naver";
+//    
+//    private String naverUserUri = "https://openapi.naver.com/v1/nid/me";
+//    
+//    private String naverTokenUri = "https://nid.naver.com/oauth2.0/token";
+	
+    @Value("${spring.security.oauth2.client.registration.kakao.client-id}")
+    private String kakaoClientId;
 
-//    @Value("${spring.security.oauth2.client.registration.kakao.client-secret}")
-    private String kakaoClientPw = "Flejpx0RTQrq2fvNfbyENG0JWfFpqUwh";
+    @Value("${spring.security.oauth2.client.registration.kakao.client-secret}")
+    private String kakaoClientPw;
 
-//    @Value("${spring.security.oauth2.client.registration.kakao.redirect-uri}")
-    private String kakaoRedirectUri = "http://localhost:5173/oauth/callback/kakao";
+    @Value("${spring.security.oauth2.client.registration.kakao.redirect-uri}")
+    private String kakaoRedirectUri;
+
+    @Value("${spring.security.oauth2.client.provider.kakao.user-info-uri}")
+    private String userUri;
+
+    @Value("${spring.security.oauth2.client.provider.kakao.token-uri}")
+    private String tokenUri;
+
+    @Value("${spring.security.oauth2.client.registration.naver.client-id}")
+    private String naverClientId;
+
+    @Value("${spring.security.oauth2.client.registration.naver.client-secret}")
+    private String naverClientPw;
+
+    @Value("${spring.security.oauth2.client.registration.naver.redirect-uri}")
+    private String naverRedirectUri;
+
+    @Value("${spring.security.oauth2.client.provider.naver.user-info-uri}")
+    private String naverUserUri;
+
+    @Value("${spring.security.oauth2.client.provider.naver.token-uri}")
+    private String naverTokenUri;
+
     
-//    @Value("${spring.security.oauth2.client.provider.kakao.user-info-uri}")
-    private String userUri = "https://kapi.kakao.com/v2/user/me";
-    
-//    @Value("${spring.security.oauth2.client.provider.kakao.token-uri}")
-    private String tokenUri = "https://kauth.kakao.com/oauth/token";
-    
-    private String naverClientId = "EFSiWGS4Omrh4Tv4ZHgm";
-    
-    private String naverClientPw = "TpgP7auqTu";
-    
-    private String naverRedirectUri = "http://localhost:5173/oauth/callback/naver";
-    
-    private String naverUserUri = "https://openapi.naver.com/v1/nid/me";
-    
-    private String naverTokenUri = "https://nid.naver.com/oauth2.0/token";
-//    private final String KAKAO_TOKEN_URL = "https://kauth.kakao.com/oauth/token";
     
     public AccessTokenResponse getKakaoAccessToken(String authorizationCode) throws Exception {
         try {

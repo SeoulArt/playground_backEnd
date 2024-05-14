@@ -36,7 +36,6 @@ public class Event {
 	private Long eventIdx;
 	
 	@OneToMany(mappedBy = "event")
-//	@JsonIgnoreProperties({"event"})
 	private List<Ticket> ticket = new ArrayList<>();
 	
 //	@OneToMany(mappedBy = "event")

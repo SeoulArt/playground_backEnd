@@ -1,5 +1,6 @@
 package com.skybory.seoulArt.domain.user.entity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.skybory.seoulArt.domain.reply.entity.Reply;
@@ -45,11 +46,11 @@ public class User {
     // 역할로는 ROLE_USER , ROLE_ADMIN , ROLE_CREATOR 가 있다.
     private String role;
     
-    @OneToOne /*(mappedBy = "user" )*/
-	private Ticket ticket;
+    @OneToMany(mappedBy = "user")
+    private List<Ticket> tickets = new ArrayList<>();
 		
     @OneToMany(mappedBy = "user")
-    private List<Reply> replies;
+    private List<Reply> replies = new ArrayList<>();
     
     // creator 들만 사용해야함
     private Dept department;	// "작품1" , "작품2", "작품3", 기획팀

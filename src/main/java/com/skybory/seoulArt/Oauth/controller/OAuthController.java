@@ -93,6 +93,9 @@ public class OAuthController {
     }
 	
     @PostMapping("/logout")
+	@Operation(summary = "로그아웃", description = "쿠키 값을 비워냅니다")
+	@ApiResponse(responseCode = "200", description = "요청 성공")
+	@ApiResponse(responseCode = "400", description = "요청 실패")
     public String logout(HttpServletRequest request, HttpServletResponse response) {
         // 'authToken' 쿠키를 찾아서 만료 시키기
         Cookie[] cookies = request.getCookies();
