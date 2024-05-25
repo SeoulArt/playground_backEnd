@@ -9,7 +9,7 @@ import com.skybory.seoulArt.domain.user.entity.User;
 
 public interface TicketRepository extends JpaRepository<Ticket, Long>{
 
-	int countByEventEventIdx(long eventIdx);
+	int countByPlayPlayId(Long playId);
 	
 	 Long findTicketIdxByUser(User user);
 }

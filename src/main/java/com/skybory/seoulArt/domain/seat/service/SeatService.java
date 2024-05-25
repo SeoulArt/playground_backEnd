@@ -7,7 +7,9 @@ import com.skybory.seoulArt.domain.seat.dto.CreateSeatResponse;
 
 public interface SeatService {
 
-	List<CreateSeatResponse> createSeats(CreateSeatRequest createSeatDTO);
+//	List<CreateSeatResponse> createSeats(CreateSeatRequest createSeatDTO);
 
 	void deleteSeat(long seatIdx);
+
+	List<CreateSeatResponse> createSeats();
 }

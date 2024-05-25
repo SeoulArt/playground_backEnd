@@ -35,7 +35,7 @@ public class Seat {
 	@OneToOne(mappedBy = "seat")	// ticket 에게 주인 권한을 줌
 	private Ticket ticket;
 	
-	private long eventIdx;		// 이벤트 값을 저장해야함, 외래키는 아직 안걸었음.
+	private Long playIdx;		// 이벤트 값을 저장해야함, 외래키는 아직 안걸었음.
 
 	
 }

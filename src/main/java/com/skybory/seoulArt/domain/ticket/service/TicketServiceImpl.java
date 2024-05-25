@@ -1,17 +1,33 @@
 package com.skybory.seoulArt.domain.ticket.service;
 
+import java.util.ArrayList;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.skybory.seoulArt.domain.event.entity.Event;
-import com.skybory.seoulArt.domain.event.repository.EventRepository;
-import com.skybory.seoulArt.domain.reply.service.ReplyServiceImpl;
+
+import com.skybory.seoulArt.Oauth.JwtUtil;
+import com.skybory.seoulArt.domain.play.entity.Play;
+import com.skybory.seoulArt.domain.play.repository.PlayRepository;
+//import com.skybory.seoulArt.domain.reply.service.ReplyServiceImpl;
 import com.skybory.seoulArt.domain.seat.entity.Seat;
 import com.skybory.seoulArt.domain.seat.repository.SeatRepository;
+import com.skybory.seoulArt.domain.ticket.dto.CompleteBookingRequest;
+import com.skybory.seoulArt.domain.ticket.dto.CompleteBookingResponse;
 import com.skybory.seoulArt.domain.ticket.dto.CreateTicketRequest;
 import com.skybory.seoulArt.domain.ticket.dto.CreateTicketResponse;
+import com.skybory.seoulArt.domain.ticket.dto.ReserveSeatRequest;
+import com.skybory.seoulArt.domain.ticket.dto.ReserveSeatResponse;
 import com.skybory.seoulArt.domain.ticket.dto.TicketDetailResponse;
+import com.skybory.seoulArt.domain.ticket.dto.TicketListResponse;
 import com.skybory.seoulArt.domain.ticket.entity.Ticket;
 import com.skybory.seoulArt.domain.ticket.repository.TicketRepository;
 import com.skybory.seoulArt.domain.user.dto.UserDTO;
@@ -21,6 +37,7 @@ import com.skybory.seoulArt.global.SeatStatus;
 import com.skybory.seoulArt.global.exception.ErrorCode;
 import com.skybory.seoulArt.global.exception.ServiceException;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
@@ -32,118 +49,145 @@ public class TicketServiceImpl implements TicketService {
 
 	private final TicketRepository ticketRepository;
 	private final UserRepository userRepository;
-	private final EventRepository eventRepository;
+	private final PlayRepository playRepository;
 	private final SeatRepository seatRepository;
+	private final JwtUtil jwtUtil;
 
-
-
-//	@Override	// 0508 주석처리
-//	@Transactional 
-//	public CreateTicketResponse create(CreateTicketRequest request) {
-//	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//	    UserDTO userDTO = (UserDTO) authentication.getPrincipal();
-//	    Long userId = userDTO.getUserId();  // UserDTO에 userId가 있다고 가정
-//		// request validation check
-//		User user = userRepository.findById(userId).orElseThrow(() -> new ServiceException(ErrorCode.USER_NOT_FOUND));
-//		eventRepository.findById(request.getEventIdx()).orElseThrow(() -> new ServiceException(ErrorCode.EVENT_NOT_FOUND));
-//		
-//		// 같은 이벤트에 대해 예약하는 경우
-//		if (user.getTicket().getEvent().getEventIdx() == request.getEventIdx() ) {
-//			throw new ServiceException(ErrorCode.DUPLICATE_TICKET);
-//		}
-//		
-//		// 빈 자리 확인(boolean), 빈자리 없을시 오류 던짐
-//		hasAvailableSeats(request.getEventIdx());
-//		
-//		
-//		
-//		Long seatIdx = 0L;
-//		// eventIdx == request.getEventIdx() 인, 자리 중에 빈 자리 하나(seatIdx가 낮은 순서부터) 예약중으로 바꿔야함.
-//		if (request.getEventIdx()==1L) {
-//			for(Long i = 1L; i<50; i++) {
-//			Seat seat =	seatRepository.findById(i).orElseThrow(() -> new ServiceException(ErrorCode.SEAT_NOT_FOUND));
-//	       
-//			if (seat.getSeatStatus() == SeatStatus.AVAILABLE) {
-//	            seat.setSeatStatus(SeatStatus.RESERVING);
-//	            seatIdx = seat.getSeatIdx();
-//	            break; // 예약된 좌석을 찾으면 루프 종료
-//				}
-//			}
-//		}
-//		
-//		if (request.getEventIdx()==2L) {
-//			
-//		}
-//		
-//		if (request.getEventIdx()==3L) {
-//			
-//		}
-//		
-//		// 티켓 생성
-//		Ticket ticket = new Ticket();
-//		// 매핑 request -> ticket
-//		mapping(request, ticket,seatIdx);
-//		// DB저장
-//		ticketRepository.save(ticket);
-//		// DTO 반환
-//		CreateTicketResponse response = new CreateTicketResponse();
-//		// 매핑 request -> response
-//		response.setEventIdx(request.getEventIdx());
-//		response.setSeatIdx(seatIdx);
-//		response.setUserIdx(request.getUserIdx());
-//		return response;
-//	}
+	//0520 주석
 	@Transactional
 	@Override
-	public CreateTicketResponse create(CreateTicketRequest request) {
+	public CreateTicketResponse create(CreateTicketRequest request, HttpServletRequest requestServlet) {
 	    log.info("create 메서드 실행");
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-	    UserDTO userDTO = (UserDTO) authentication.getPrincipal();
-	    Long userId = userDTO.getUserId();  // UserDTO에 userId가 있다고 가정	    
-//	    User user = userRepository.findById(userId).orElseThrow(() -> new ServiceException(ErrorCode.USER_NOT_FOUND));
-	    Long eventId = request.getEventIdx();
-		Event event = eventRepository.findById(eventId).orElseThrow(() -> new ServiceException(ErrorCode.EVENT_NOT_FOUND));
+//		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//	    UserDTO userDTO = (UserDTO) authentication.getPrincipal();
+//	    Long userId = userDTO.getUserId();  // UserDTO에 userId가 있다고 가정	    
+	    
+		String bearerToken = requestServlet.getHeader("Authorization");
+		String accessToken = bearerToken.substring(7);
+		Long userId = jwtUtil.getUserIdFromToken(accessToken);
+		
+		//	    User user = userRepository.findById(userId).orElseThrow(() -> new ServiceException(ErrorCode.USER_NOT_FOUND));
+	    
+		Long playId = request.getPlayId();
+		Play play = playRepository.findById(playId).orElseThrow(() -> new ServiceException(ErrorCode.PLAY_NOT_FOUND));
 		
 		// 유저가 티켓을 가지고있는지 판단
 		log.info("canBook 실행");
-		canBook(userId, event.getTitle());
+		canBook(userId, play.getTitle());
 		
 
 		
 		log.info("hasAvailableSeats 실행");
-	    hasAvailableSeats(eventId);
+	    hasAvailableSeats(playId);
 
 	    // 좌석 번호 지정
-	    Long seatIdx = findAvailableSeat(eventId);
+	    Long seatIdx = findAvailableSeat(playId);
 
 	    // 티켓 생성
 	    log.info("new Ticket() 실행");
 	    Ticket ticket = new Ticket();
-	    mapping(userId, ticket, seatIdx, eventId);
+	    mapping(userId, ticket, seatIdx, playId);
 	    ticketRepository.save(ticket);
 
 	    CreateTicketResponse response = new CreateTicketResponse();
-	    response.setEventIdx(eventId);
-	    response.setSeatIdx(seatIdx);
-	    response.setUserIdx(userId);
+	    response.setPlayId(playId);
+	    response.setTicketId(ticket.getTicketIdx()); 			// 이 부분이 에러날 수 있음
+//	    response.setSeatIdx(seatIdx);
+//	    response.setUserIdx(userId);
 
 	    return response;
 	}
 
+//	@Transactional
+//	@Override
+//	public ReserveSeatResponse reserveSeat(ReserveSeatRequest request) {
+//	    log.info("reserveSeat 메서드 실행");
+//	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//	    UserDTO userDTO = (UserDTO) authentication.getPrincipal();
+//	    Long userId = userDTO.getUserId();
+//	    
+//
+//	    Long playId = request.getPlayId();
+//	    Play play = playRepository.findById(playId).orElseThrow(() -> new ServiceException(ErrorCode.PLAY_NOT_FOUND));
+//	    
+//	    log.info("canBook 실행");
+//	    canBook(userId, play.getTitle());
+//
+//	    log.info("hasAvailableSeats 실행");
+//	    hasAvailableSeats(playId);
+//
+//	    // 좌석 번호 지정 및 예약 상태 변경
+//	    Long seatIdx = findAvailableSeat(playId);
+//	    Seat seat = seatRepository.findById(seatIdx).orElseThrow(() -> new ServiceException(ErrorCode.SEAT_NOT_FOUND));
+//	    seat.setSeatStatus(SeatStatus.RESERVING);
+//	    seatRepository.save(seat);
+//
+//	    // 티켓 생성
+//	    log.info("new Ticket() 실행");
+//	    Ticket ticket = new Ticket();
+//	    mapping(userId, ticket, seatIdx, playId);
+//	    ticketRepository.save(ticket);
+//
+//	    ReserveSeatResponse response = new ReserveSeatResponse();
+//	    response.setPlayId(playId);
+//	    response.setTicketId(ticket.getTicketIdx());
+//	    response.setSeatId(seatIdx);		// 이게 필요한가?
+//
+//	    return response;
+//	}
 	
-    public boolean canBook(Long userId, String newEventTitle) throws ServiceException {
+//	@Transactional
+//	@Override
+//	public String completeBooking(CompleteBookingRequest request) {
+//	    log.info("completeBooking 메서드 실행");
+//	    Long ticketId = request.getTicketId();
+//	    Ticket ticket = ticketRepository.findById(ticketId).orElseThrow(() -> new ServiceException(ErrorCode.TICKET_NOT_FOUND));
+//	    Seat seat = ticket.getSeat();
+//
+//	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//	    UserDTO userDTO = (UserDTO) authentication.getPrincipal();
+//	    Long userId = userDTO.getUserId();
+//	    User user = userRepository.findById(userId).orElseThrow(() -> new ServiceException(ErrorCode.USER_NOT_FOUND));
+//	    
+//	    if (user.getPhoneNumber() != null) {
+//	        seat.setSeatStatus(SeatStatus.RESERVED);
+//	        seatRepository.save(seat);
+//	        return "Complete Booking with phoneNumber";
+//	    } else {
+//	        // 5분 후에 체크하여 전화번호가 여전히 입력되지 않았다면 예약 취소
+//	        scheduleCancellation(seat.getSeatIdx(), ticketId);
+//	        return "Cancle Booking in 1 Minutes";
+//	    }
+//	}
+//
+//	@Transactional
+//	private void scheduleCancellation(Long seatId, Long ticketId) {
+//	    ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+//	    log.info("scheduleCancellation 실행");
+//	    scheduler.schedule(() -> {
+//	        Seat seat = seatRepository.findById(seatId).orElse(null);
+//	        if (seat != null && seat.getSeatStatus() == SeatStatus.RESERVING) {
+//	        	deleteTicket(ticketId);
+////	            ticketRepository.deleteById(ticketId);
+//	            log.info("예약 취소됨: ticket ID " + ticketId);
+//	        }
+//	    }, 1, TimeUnit.MINUTES);
+//	    scheduler.shutdown();
+//	}
+	
+    public boolean canBook(Long userId, String newplayTitle) throws ServiceException {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new ServiceException(ErrorCode.USER_NOT_FOUND));
 
-        if (user.getTickets() == null || user.getTickets().isEmpty()) {
+        if (user.getTicketList() == null || user.getTicketList().isEmpty()) {
             return true;  // 티켓을 가지고 있지 않으면 예매 가능
         }
         
         // 이미 가지고 있는 티켓 중에서 새 이벤트 제목과 동일한 제목을 가진 티켓이 있는지 확인
-        boolean hasDuplicateEventTicket = user.getTickets().stream()
-            .anyMatch(ticket -> ticket.getEvent().getTitle().equals(newEventTitle));
+        boolean hasDuplicateplayTicket = user.getTicketList().stream()
+            .anyMatch(ticket -> ticket.getPlay().getTitle().equals(newplayTitle));
 
-        if (hasDuplicateEventTicket) {
+        if (hasDuplicateplayTicket) {
             throw new ServiceException(ErrorCode.DUPLICATE_TICKET);
         }
 
@@ -151,23 +195,34 @@ public class TicketServiceImpl implements TicketService {
     }
 
 	@Transactional
-	public void mapping(Long userId, Ticket ticket, Long seatIdx, Long eventId) {
+	public void mapping(Long userId, Ticket ticket, Long seatIdx, Long playId) {
 		// 사용자, 이벤트 및 좌석 정보 조회
 		User user = userRepository.findById(userId) .orElseThrow(() -> new ServiceException(ErrorCode.USER_NOT_FOUND));
-		Event event = eventRepository.findById(eventId) .orElseThrow(() -> new ServiceException(ErrorCode.EVENT_NOT_FOUND));
+		Play play = playRepository.findById(playId) .orElseThrow(() -> new ServiceException(ErrorCode.PLAY_NOT_FOUND));
 		Seat seat = seatRepository.findById(seatIdx) .orElseThrow(() -> new ServiceException(ErrorCode.SEAT_NOT_FOUND));
 		
 		ticket.setSeat(seat);
 		ticket.setUser(user);
-		ticket.changeEvent(event);
+		ticket.changePlay(play);
 		ticket.changeUser(user);
 //		user.setTickets.add(ticket);
 	}
 	
 	
-	public Long findAvailableSeat(Long eventIdx) {
-	    Long startSeatIdx = (eventIdx - 1) * 50 + 1; // 각 이벤트에 50개의 좌석을 가정
-	    Long endSeatIdx = eventIdx * 50;
+	public Long findAvailableSeat(Long playIdx) {
+	    Long startSeatIdx;
+	    Long endSeatIdx;
+	    if (playIdx == 1L || playIdx == 2L) {
+	        startSeatIdx = 1 + (playIdx - 1) * 72;  // 1번 공연과 2번 공연은 72개의 좌석을 가진다.
+	        endSeatIdx = playIdx * 72;
+	    } else if (playIdx == 3L || playIdx == 4L) {
+	        startSeatIdx = 145 + (playIdx - 3) * 60;  // 3번 공연과 4번 공연은 60개의 좌석을 가진다.
+	        endSeatIdx = 144 + (playIdx-2) * 60;
+	    } else {
+	        startSeatIdx = 265 + (playIdx - 5) * 72;  // 5번 공연과 6번 공연은 72개의 좌석을 가진다.
+	        endSeatIdx = 264 + (playIdx-4) * 72;
+	    }
+
 	    for (Long i = startSeatIdx; i <= endSeatIdx; i++) {
 	        Seat seat = seatRepository.findById(i).orElseThrow(() -> new ServiceException(ErrorCode.SEAT_NOT_FOUND));
 	        if (seat.getSeatStatus() == SeatStatus.AVAILABLE) {
@@ -180,77 +235,128 @@ public class TicketServiceImpl implements TicketService {
  
 	
 	
-	
-	
-//	// 공연 취소하기
-//	@Override
-//	@Transactional
-//	public void deleteTicket(Long userId, Long ticketIdx) {
-//		// 해당 사용자의 특정 이벤트에 대한 티켓을 찾아서 삭제
-//		User user = userRepository.findById(userId).orElseThrow();
-//		Long ticketIdx = user.getTickets().getTicketIdx();
+//	// 빈 자리 확인
+//	public boolean hasAvailableSeats(Long playId) {
+//	    int totalSeats;
+//	    if (playId == 1L || playId == 2L) {
+//	        totalSeats = 72;
+//	    } else if (playId == 3L || playId == 4L) {
+//	        totalSeats = 60;
+//	    } else {
+//	        totalSeats = 72;
+//	    }
 //
-//		
-//        boolean hasTicket = user.getTickets().stream()
-//                .anyMatch(ticket -> ticket.getTicketIdx().equals(ticketIdx));
-//		
-//		user.setTicket(null);
-//		userRepository.save(user); // 변경된 상태를 데이터베이스에 반영
-//
-//		ticketRepository.findById(ticketIdx).get().getSeat().setSeatStatus(SeatStatus.AVAILABLE);
-//		ticketRepository.deleteById(ticketIdx);
+//	    int bookedSeats = (int) ticketRepository.countByPlayPlayId(playId);
+//	    if (totalSeats <= bookedSeats) {
+//	        throw new ServiceException(ErrorCode.SEAT_UNAVAILABLE);
+//	    } else
+//		return true;
 //	}
-//
-
 	
-//	private void existTicket(final long ticketId) {
-//		if(ticketRepository.existsById(ticketId)) {
-//			throw new ServiceException(ErrorCode.DUPLICATE_TICKET);
-//		}
-//	}
-
-
-	
-	// 빈 자리 확인
-	public void hasAvailableSeats(Long eventId) {
-//		Event event = eventRepository.findById(eventIdx) .orElseThrow(() -> new ServiceException(ErrorCode.EVENT_NOT_FOUND));
-		// 총 좌석 수
-		int totalSeats = 50;
-		int bookedSeats = (int) ticketRepository.countByEventEventIdx(eventId);
-		System.out.println("bookedSeats : " + bookedSeats);
-		if ( totalSeats <= bookedSeats) {
-			throw new ServiceException(ErrorCode.SEAT_UNAVAILABLE);
-		}
+	public boolean hasAvailableSeats(Long playId) {
+//	    int totalSeats;
+//	    if (playId == 1L || playId == 2L) {
+//	        totalSeats = 72;
+//	    } else if (playId == 3L || playId == 4L) {
+//	        totalSeats = 60;
+//	    } else {
+//	        totalSeats = 72;
+//	    }
+	    // 데이터베이스에서 해당 playId를 가지고, seatStatus가 AVAILABLE인 좌석의 수를 카운트
+	    int availableSeats = seatRepository.countByPlayIdxAndSeatStatus(playId, SeatStatus.AVAILABLE);
+	    if (availableSeats > 0) {
+	        return true; // 사용 가능한 좌석이 하나 이상 있다면 true 반환
+	    } else {
+	        return false; // 사용 가능한 좌석이 없다면 예외 발생
+	    }
 	}
 
 
 	@Override
-	public void deleteTicket(long userId) {
-		// TODO Auto-generated method stub
+	@Transactional
+	public void deleteTicket(Long ticketId, HttpServletRequest requestServlet) {
+//		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//	    UserDTO userDTO = (UserDTO) authentication.getPrincipal();
+//	    Long userId = userDTO.getUserId();  // UserDTO에 userId가 있다고 가정	 
+	    
+		User user = findUserByHeader(requestServlet);
+
+		List<Ticket> tickets = user.getTicketList();
 		
+		// 같은것찾기
+	    Optional<Ticket> ticketOptional = tickets.stream()
+	            .filter(ticket -> ticket.getTicketIdx().equals(ticketId))
+	            .findFirst();
+
+	        // 티켓이 존재하면 삭제
+	        if (ticketOptional.isPresent()) {
+	            Ticket ticketToDelete = ticketOptional.get();
+	            Seat seat = ticketToDelete.getSeat();
+	            // tickets.remove(ticketToDelete); // user의 티켓 목록에서 제거, 필요하다면
+	            ticketRepository.delete(ticketToDelete); // ticketRepository를 통해 실제로 삭제
+	            seat.setSeatStatus(SeatStatus.AVAILABLE);
+	        } else {
+	            throw new ServiceException(ErrorCode.TICKET_NOT_FOUND);
+	        }
+	    }
+
+	@Override
+	public TicketListResponse getTicketList() {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+	    UserDTO userDTO = (UserDTO) authentication.getPrincipal();
+	    Long userId = userDTO.getUserId();  // UserDTO에 userId가 있다고 가정	 
+		User user = userRepository.findById(userId).orElseThrow(() -> new ServiceException(ErrorCode.USER_NOT_FOUND));
+		
+        List<Long> playIds = user.getTicketList().stream()
+                .map(ticket -> ticket.getPlay().getPlayId())
+                .collect(Collectors.toList());
+		TicketListResponse response = new TicketListResponse();
+		response.setTicketList(playIds);
+		
+		return response;
 	}
 
 
 	@Override
-	public TicketDetailResponse findTicket(long userId) {
-		// TODO Auto-generated method stub
-		return null;
+	public List<Long> getAvailableList() {
+	    List<Long> availablePlays = new ArrayList<>(); // 사용 가능한 공연 번호를 저장할 리스트
+	    for (Long i = 1L; i <= 6; i++) { // 1부터 6까지 반복
+	        if (hasAvailableSeats(i)) { // 사용 가능한 자리가 있다면
+	            availablePlays.add(i); // 리스트에 공연 번호 추가
+	        }
+	    }
+	    return availablePlays; // 사용 가능한 공연 번호 리스트 반환
 	}
+	
+//	public User findUserByCookie() {
+//		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//	    UserDTO userDTO = (UserDTO) authentication.getPrincipal();
+//	    Long userId = userDTO.getUserId();  // UserDTO에 userId가 있다고 가정	    
+//	    User user = userRepository.findById(userId).orElseThrow(() -> new ServiceException(ErrorCode.USER_NOT_FOUND));
+//	    return user;
+//	}
 
-// 잠시주석 0514
+	public User findUserByHeader(HttpServletRequest requestServlet) {
+		String bearerToken = requestServlet.getHeader("Authorization");
+		String accessToken = bearerToken.substring(7);
+		Long userId = jwtUtil.getUserIdFromToken(accessToken);
+		User user = userRepository.findById(userId).orElseThrow(() -> new ServiceException(ErrorCode.USER_NOT_FOUND));
+		return user;
+	}
+	
+	
+
 //	@Override
-//	public TicketDetailResponse findTicket(long userId) {
-//		User user = userRepository.findById(userId).orElseThrow(() -> new ServiceException(ErrorCode.USER_NOT_FOUND));
-//		Ticket ticket = user.getTickets();
-//		Event event = ticket.getEvent();
-//		Seat seat = ticket.getSeat();
+//	public TicketDetailResponse getTicketDetail(Long ticketId) {
 //		
+//		Ticket ticket = ticketRepository.findById(ticketId).orElseThrow(() -> new ServiceException(ErrorCode.TICKET_NOT_FOUND));
 //		TicketDetailResponse response = new TicketDetailResponse();
+//		Play play = playRepository.findById(ticket.getPlay().getPlayId());
 //		// dto 매핑
-//		response.setEventDetail(event.getDetail());
-//		response.setEventIdx(event.getEventIdx());
-//		response.setEventImage(event.getImage());
-//		response.setEventTitle(event.getTitle());
+//		response.setplayDetail(play.getDetail());
+//		response.setplayIdx(play.getplayIdx());
+//		response.setplayImage(play.getImage());
+//		response.setplayTitle(play.getTitle());
 //		
 //		response.setSeatIdx(seat.getSeatIdx());
 //		response.setSeatStatus(seat.getSeatStatus());
@@ -267,13 +373,13 @@ public class TicketServiceImpl implements TicketService {
 //	public CreateTicketResponse createTicket(CreateTicketRequest request) {
 //		// 사용자, 이벤트 및 좌석 정보 조회
 //		User user = userRepository.findById(request.getUserIdx()) .orElseThrow(() -> new ServiceException(ErrorCode.USER_NOT_FOUND));
-//		Event event = eventRepository.findById(request.getEventIdx()) .orElseThrow(() -> new ServiceException(ErrorCode.EVENT_NOT_FOUND));
+//		play play = playRepository.findById(request.getplayIdx()) .orElseThrow(() -> new ServiceException(ErrorCode.play_NOT_FOUND));
 //		Seat seat = seatRepository.findById(request.getSeatIdx()) .orElseThrow(() -> new ServiceException(ErrorCode.SEAT_NOT_FOUND));
 //
 //		// 티켓 생성 로직
 //		Ticket ticket = new Ticket();
 //		ticket.setUser(user);
-//		ticket.changeEvent(event);
+//		ticket.changeplay(play);
 //		ticket.setSeat(seat);
 //		ticket.getSeat().setSeatStatus(SeatStatus.RESERVED);
 //		// 티켓 저장 및 반환
@@ -281,17 +387,17 @@ public class TicketServiceImpl implements TicketService {
 //	}
 //	// 공연 예약하기
 //	@Override
-//	public Ticket createTicket(Long userIdx, Long eventIdx, Long seatIdx) {
+//	public Ticket createTicket(Long userIdx, Long playIdx, Long seatIdx) {
 //
 //		// 사용자, 이벤트 및 좌석 정보 조회
 //		User user = userRepository.findById(userIdx) .orElseThrow(() -> new ServiceException(ErrorCode.USER_NOT_FOUND));
-//		Event event = eventRepository.findById(eventIdx) .orElseThrow(() -> new ServiceException(ErrorCode.EVENT_NOT_FOUND));
+//		play play = playRepository.findById(playIdx) .orElseThrow(() -> new ServiceException(ErrorCode.play_NOT_FOUND));
 //		Seat seat = seatRepository.findById(seatIdx) .orElseThrow(() -> new ServiceException(ErrorCode.SEAT_NOT_FOUND));
 //
 //		// 티켓 생성 로직
 //		Ticket ticket = new Ticket();
 //		ticket.setUser(user);
-//		ticket.changeEvent(event);
+//		ticket.changeplay(play);
 //		ticket.setSeat(seat);
 //		ticket.getSeat().setSeatStatus(SeatStatus.RESERVED);
 //		// 티켓 저장 및 반환
@@ -299,11 +405,11 @@ public class TicketServiceImpl implements TicketService {
 //	}
 	
 //	@Override
-//	public boolean checkAvailability(Event event) {
+//	public boolean checkAvailability(play play) {
 //		// 이벤트의 총 좌석 수
-//		int totalSeats = ticketRepository.getTotalSeatsByEvent(event);
+//		int totalSeats = ticketRepository.getTotalSeatsByplay(play);
 //		// 이벤트의 예약된 좌석 수
-//		int reservedSeats = ticketRepository.getReservedSeatsByEvent(event);
+//		int reservedSeats = ticketRepository.getReservedSeatsByplay(play);
 //		// 잔여 좌석 수 계산 ( 전체 좌석 - 예약된 좌석 )
 //		int availableSeats = totalSeats - reservedSeats;
 //		// 잔여 좌석이 있으면 true 반환, 없으면 false 반환

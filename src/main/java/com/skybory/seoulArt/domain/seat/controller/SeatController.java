@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.skybory.seoulArt.domain.event.controller.EventController;
+import com.skybory.seoulArt.domain.play.controller.PlayController;
 import com.skybory.seoulArt.domain.seat.dto.CreateSeatRequest;
 import com.skybory.seoulArt.domain.seat.dto.CreateSeatResponse;
 import com.skybory.seoulArt.domain.seat.service.SeatService;
@@ -34,14 +34,14 @@ public class SeatController {
 	private final SeatService seatService;
 	
 //	@Secured("ROLE_ADMIN")
-//	@PostMapping("")		// 포스트맨 테스트 완료 0417
+	@PostMapping("")		// 포스트맨 테스트 완료 0417
 	@Operation(summary = "좌석 생성", description = "티켓 예약이 가능한 좌석을 생성합니다")
 	@ApiResponse(responseCode="200", description="성공")
 	@ApiResponse(responseCode="400", description="에러")
-	public ResponseEntity<List<CreateSeatResponse>> createSeats(@RequestBody CreateSeatRequest request){
+	public ResponseEntity<List<CreateSeatResponse>> createSeats(){
 		// 좌석 생성
 //		seatService.createSeats(createSeatDTO);
-		return ResponseEntity.ok(seatService.createSeats(request));
+		return ResponseEntity.ok(seatService.createSeats());
 	}
 	
 //	@DeleteMapping("/{seatIdx}")	// 포스트맨 테스트 완료 0417

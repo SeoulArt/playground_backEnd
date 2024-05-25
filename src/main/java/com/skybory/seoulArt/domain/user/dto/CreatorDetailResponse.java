@@ -1,6 +1,7 @@
 package com.skybory.seoulArt.domain.user.dto;
 
-import com.skybory.seoulArt.global.Dept;
+
+import java.util.List;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -9,9 +10,11 @@ import lombok.Setter;
 @Setter
 public class CreatorDetailResponse {
 
+	private Long id;
 	private String username;
-	private Dept department;
+	private String department;
 	private String image;
 	private String description;
 	private String profileImage;
+	private String playList;
 }

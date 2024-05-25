@@ -25,6 +25,7 @@ import com.skybory.seoulArt.Oauth.dto.LoginRequest;
 import com.skybory.seoulArt.Oauth.dto.NaverMemberResponse;
 import com.skybory.seoulArt.Oauth.dto.UrlResponse;
 import com.skybory.seoulArt.Oauth.service.OAuth2Service;
+import com.skybory.seoulArt.domain.user.dto.LoginResponse;
 import com.skybory.seoulArt.domain.user.dto.UserDTO;
 import com.skybory.seoulArt.domain.user.service.UserService;
 import com.skybory.seoulArt.global.exception.ErrorCode;
@@ -44,17 +45,11 @@ import lombok.extern.log4j.Log4j2;
 @RequestMapping("/api/auth")
 public class OAuthController {
 
-    @Autowired
-    private JwtUtil jwtUtil;
-	OAuthProvider oAuthProvider = new OAuthProvider();
 
-	@Autowired
-	private OAuth2Service oAuth2Service; // OAuth2 서비스에 대한 의존성 주입
-
-	@Autowired
-	private UserService userService;
-//	private CustomOAuth2UserService customOAuth2UserService;
-
+    private final JwtUtil jwtUtil;
+    private final OAuthProvider oAuthProvider;
+    private final OAuth2Service oAuth2Service;
+    private final UserService userService;
 
 	@GetMapping("/{provider}/url") // 클라이언트로부터 GET 요청을 받음		-> provider 삭제
 	@Operation(summary = "로그인 url 요청", description = "카카오, 또는 네이버 로그인 url을 요청합니다")
@@ -74,68 +69,56 @@ public class OAuthController {
 	@Operation(summary = "토큰 갱신하기", description = "토큰을 갱신합니다")
 	@ApiResponse(responseCode = "200", description = "요청 성공")
 	@ApiResponse(responseCode = "400", description = "요청 실패")
-    public ResponseEntity<UserDTO> refreshAccessToken(HttpServletRequest request) {
-        String refreshToken = extractRefreshTokenFromCookie(request);
-        
+    public ResponseEntity<LoginResponse> refreshAccessToken(HttpServletRequest request) {
+		String bearerToken = request.getHeader("Authorization");
+	    if (bearerToken == null || !bearerToken.startsWith("Bearer ")) {
+	        throw new ServiceException(ErrorCode.INVALID_TOKEN);
+	    }
+	    String refreshToken = bearerToken.substring(7);  // "Bearer " 후의 문자열을 추출
+	    log.info("헤더에서 refreshToken 추출: " + refreshToken);
+//        String refreshToken = extractRefreshTokenFromCookie(request);
+//        log.info("쿠키에서 refreshToken 추출 : " + refreshToken );
         // refreshToken 이 없거나, validate 가 false 일 때
         if (refreshToken == null || !jwtUtil.validateToken(refreshToken)) {
         	 throw new ServiceException(ErrorCode.INVALID_TOKEN);
         }
 
         Long userId = jwtUtil.getUserIdFromToken(refreshToken);
-        UserDTO response = userService.loadUserByUserId(userId);
-        String newAccessToken = jwtUtil.generateAccessToken(userId);
-        String newRefreshToken = jwtUtil.generateRefreshToken(userId);
-        HttpHeaders headers = new HttpHeaders();
-        jwtUtil.setAccessToken(headers, newAccessToken);
-        jwtUtil.setRefreshToken(headers, newRefreshToken);
+        UserDTO user = userService.loadUserByUserId(userId);
+        String jwtAccessToken = jwtUtil.generateAccessToken(userId);
+        String jwtRefreshToken = jwtUtil.generateRefreshToken(userId);
+	    LoginResponse response = new LoginResponse();
+	    response.setUser(user);
+	    response.setAccessToken(jwtAccessToken);
+	    response.setRefreshToken(jwtRefreshToken);
+//        HttpHeaders headers = new HttpHeaders();
+//        jwtUtil.setAccessToken(headers, newAccessToken);
+//        jwtUtil.setRefreshToken(headers, newRefreshToken);
+//        log.info("새로운 accessToken : " + newAccessToken);
+//        log.info("새로운 refreshToken : " + newRefreshToken);
         return ResponseEntity.ok().body(response);
     }
 	
-    @PostMapping("/logout")
-	@Operation(summary = "로그아웃", description = "쿠키 값을 비워냅니다")
-	@ApiResponse(responseCode = "200", description = "요청 성공")
-	@ApiResponse(responseCode = "400", description = "요청 실패")
-    public String logout(HttpServletRequest request, HttpServletResponse response) {
-        // 'authToken' 쿠키를 찾아서 만료 시키기
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if (cookie.getName().equals("accessToken")) {
-                    cookie.setValue(""); // 쿠키의 값을 빈 문자열로 설정
-                    cookie.setPath("/"); // 쿠키의 경로 설정
-                    cookie.setMaxAge(0); // 쿠키의 만료 시간을 0으로 설정하여 즉시 만료
-                    response.addCookie(cookie); // 응답에 쿠키 추가하여 클라이언트로 전송
-                }
-                if (cookie.getName().equals("refreshToken")) {
-                	cookie.setValue(""); // 쿠키의 값을 빈 문자열로 설정
-                	cookie.setPath("/"); // 쿠키의 경로 설정
-                	cookie.setMaxAge(0); // 쿠키의 만료 시간을 0으로 설정하여 즉시 만료
-                	response.addCookie(cookie); // 응답에 쿠키 추가하여 클라이언트로 전송
-                }
-            }
-        }
-        return "로그아웃 성공";
-    }
-
-//    private String extractRefreshTokenFromCookie(HttpServletRequest request) {
-//        Cookie[] cookies = request.getCookies();
-//        if (cookies != null) {
-//            for (Cookie cookie : cookies) {
-//                if ("refreshToken".equals(cookie.getName())) {
-//                    return cookie.getValue();
-//                }
-//            }
-//        }
-//        return null;
+//    @PostMapping("/logout")
+//	@Operation(summary = "로그아웃", description = "쿠키 값을 비워냅니다")
+//	@ApiResponse(responseCode = "200", description = "요청 성공")
+//	@ApiResponse(responseCode = "400", description = "요청 실패")
+//    public ResponseEntity<String> logout(HttpServletRequest request, HttpServletResponse response) {
+//    	log.info("로그아웃 메서드 실행");
+//        log.info("로그아웃 메서드 실행");
+//        HttpHeaders headers = jwtUtil.expireCookies();
+//        return ResponseEntity.ok()
+//                .headers(headers)
+//                .body("로그아웃 성공");
 //    }
+
 	
 	// 카카오 로그인
 	@Operation(summary = "카카오 로그인", description = "카카오 회원 정보를 가져옵니다")
 	@ApiResponse(responseCode = "200", description = "요청 성공")
 	@ApiResponse(responseCode = "400", description = "요청 실패")
 	@PostMapping("/kakao/login")
-	public ResponseEntity<UserDTO> kakaoLogin(@RequestBody LoginRequest request) throws Exception {
+	public ResponseEntity<LoginResponse> kakaoLogin(@RequestBody LoginRequest request) throws Exception {
 	    // 인가코드 받기
 	    String code = request.getCode();
 	    // 카카오가 엑세스 토큰을 발급받음
@@ -153,12 +136,60 @@ public class OAuthController {
 	    String jwtAccessToken = jwtUtil.generateAccessToken(user.getUserId());
 	    String jwtRefreshToken = jwtUtil.generateRefreshToken(user.getUserId());
 
-        HttpHeaders headers = new HttpHeaders();
-        jwtUtil.setAccessToken(headers, jwtAccessToken);
-        jwtUtil.setRefreshToken(headers, jwtRefreshToken);
-	    log.info("쿠키 저장 성공");
+	    LoginResponse response = new LoginResponse();
+	    response.setUser(user);
+	    response.setAccessToken(jwtAccessToken);
+	    response.setRefreshToken(jwtRefreshToken);
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.set("Authorization", "Bearer " + jwtAccessToken); // 액세스 토큰을 헤더에 추가
+//        headers.set("Refresh-Token", jwtRefreshToken); // 리프레시 토큰을 헤더에 추가
 
-	    return ResponseEntity.ok().headers(headers).body(user);
+//        log.info("헤더에 토큰 추가 성공");
+//        jwtUtil.setAccessToken(headers, jwtAccessToken);
+//        jwtUtil.setRefreshToken(headers, jwtRefreshToken);
+        
+//	    log.info("쿠키 저장 성공");
+
+//	    return ResponseEntity.ok().headers(headers).body(user);
+	    return ResponseEntity.ok().body(response);
+	}
+
+	// 카카오 로그인
+	@Operation(summary = "카카오 로그인", description = "카카오 회원 정보를 가져옵니다")
+	@ApiResponse(responseCode = "200", description = "요청 성공")
+	@ApiResponse(responseCode = "400", description = "요청 실패")
+	@PostMapping("/local/kakao/login")
+	public ResponseEntity<LoginResponse> localLogin(@RequestBody LoginRequest request) throws Exception {
+		// 인가코드 받기
+		String code = request.getCode();
+		// 카카오가 엑세스 토큰을 발급받음
+		AccessTokenResponse accessTokenResponse = oAuthProvider.getLocalAccessToken(code);
+		System.out.println("로컬 토큰 받아오기 성공");
+		String accessToken = accessTokenResponse.getAccess_token();
+		// 카카오 멤버 정보 반환
+		KakaoMemberResponse kakaoMemberResponse = oAuthProvider.getMemberInfo(accessToken);
+		System.out.println("로컬 정보 받아오기 성공");
+		
+		// 유저 DTO에 카카오 멤버 정보 매핑
+		UserDTO user = userService.login(kakaoMemberResponse);
+		
+		// JWT 액세스 토큰과 리프레시 토큰 생성
+		String jwtAccessToken = jwtUtil.generateAccessToken(user.getUserId());
+		String jwtRefreshToken = jwtUtil.generateRefreshToken(user.getUserId());
+	    LoginResponse response = new LoginResponse();
+	    response.setUser(user);
+	    response.setAccessToken(jwtAccessToken);
+	    response.setRefreshToken(jwtRefreshToken);
+//		HttpHeaders headers = new HttpHeaders();
+//	    headers.set("Authorization", "Bearer " + jwtAccessToken); // 액세스 토큰을 헤더에 추가
+//	    headers.set("Refresh-Token", jwtRefreshToken); // 리프레시 토큰을 헤더에 추가
+
+//	    log.info("헤더에 토큰 추가 성공");
+//		jwtUtil.setAccessToken(headers, jwtAccessToken);
+//		jwtUtil.setRefreshToken(headers, jwtRefreshToken);
+		log.info("쿠키 저장 성공");
+		
+		return ResponseEntity.ok().body(response);
 	}
 	
 	// 네이버 로그인 메서드
@@ -166,7 +197,7 @@ public class OAuthController {
 	@ApiResponse(responseCode = "200", description = "요청 성공")
 	@ApiResponse(responseCode = "400", description = "요청 실패")
 	@PostMapping("/naver/login")
-	public ResponseEntity<UserDTO> naverLogin(@RequestBody LoginRequest request) throws Exception {
+	public ResponseEntity<LoginResponse> naverLogin(@RequestBody LoginRequest request) throws Exception {
 	    String code = request.getCode();
 	    AccessTokenResponse accessTokenResponse = oAuthProvider.getNaverAccessTokenV2(code);
 	    String accessToken = accessTokenResponse.getAccess_token();
@@ -176,116 +207,57 @@ public class OAuthController {
 	    // JWT 액세스 토큰과 리프레시 토큰 생성
 	    String jwtAccessToken = jwtUtil.generateAccessToken(user.getUserId());
 	    String jwtRefreshToken = jwtUtil.generateRefreshToken(user.getUserId());
-
-        HttpHeaders headers = new HttpHeaders();
-        jwtUtil.setAccessToken(headers, jwtAccessToken);
-        jwtUtil.setRefreshToken(headers, jwtRefreshToken);
+//
+//        HttpHeaders headers = new HttpHeaders();
+//        jwtUtil.setAccessToken(headers, jwtAccessToken);
+//        jwtUtil.setRefreshToken(headers, jwtRefreshToken);
+	    LoginResponse response = new LoginResponse();
+	    response.setUser(user);
+	    response.setAccessToken(jwtAccessToken);
+	    response.setRefreshToken(jwtRefreshToken);
 	    log.info("쿠키 저장 성공");
 
-	    return ResponseEntity.ok().headers(headers).body(user);
+	    return ResponseEntity.ok().body(response);
+	}
+
+	// 네이버 로그인 메서드
+	@Operation(summary = "네이버 로그인", description = "네이버 회원 정보를 가져옵니다")
+	@ApiResponse(responseCode = "200", description = "요청 성공")
+	@ApiResponse(responseCode = "400", description = "요청 실패")
+	@PostMapping("/local/naver/login")
+	public ResponseEntity<LoginResponse> localNaverLogin(@RequestBody LoginRequest request) throws Exception {
+		String code = request.getCode();
+		AccessTokenResponse accessTokenResponse = oAuthProvider.getNaverAccessTokenV2(code);
+		String accessToken = accessTokenResponse.getAccess_token();
+		NaverMemberResponse naverMemberResponse = oAuthProvider.getNaverInfo(accessToken);
+		
+		UserDTO user = userService.login(naverMemberResponse);
+		// JWT 액세스 토큰과 리프레시 토큰 생성
+		String jwtAccessToken = jwtUtil.generateAccessToken(user.getUserId());
+		String jwtRefreshToken = jwtUtil.generateRefreshToken(user.getUserId());
+		
+//		HttpHeaders headers = new HttpHeaders();
+//		jwtUtil.setAccessToken(headers, jwtAccessToken);
+//		jwtUtil.setRefreshToken(headers, jwtRefreshToken);
+	    LoginResponse response = new LoginResponse();
+	    response.setUser(user);
+	    response.setAccessToken(jwtAccessToken);
+	    response.setRefreshToken(jwtRefreshToken);
+//		log.info("쿠키 저장 성공");
+//		
+		return ResponseEntity.ok().body(response);
 	}
 	
-    private String extractRefreshTokenFromCookie(HttpServletRequest request) {
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if ("refreshToken".equals(cookie.getName())) {
-                    return cookie.getValue();
-                }
-            }
-        }
-        return null;
-    }
+//    private String extractRefreshTokenFromCookie(HttpServletRequest request) {
+//        Cookie[] cookies = request.getCookies();
+//        if (cookies != null) {
+//            for (Cookie cookie : cookies) {
+//                if ("refreshToken".equals(cookie.getName())) {
+//                    return cookie.getValue();
+//                }
+//            }
+//        }
+//        return null;
+//    }
 	
 }
-
-//	@Operation(summary = "카카오 로그인", description = "인가코드로 토큰을 받아오고 회원정보를 반환합니다")
-//	@ApiResponse(responseCode = "200", description = "요청 성공")
-//	@ApiResponse(responseCode = "400", description = "요청 실패")
-//	@PostMapping("/kakao/login")
-//	public ResponseEntity<UserDTO> kakaoLogin(@RequestBody Map<String, String> requestBody) throws Exception {
-//
-//		String code = requestBody.get("code");
-////		OAuthProvider provider = new OAuthProvider();
-//
-//		// 액세스 토큰 받아오기
-//		AccessTokenResponse accessTokenResponse = provider.getKakaoAccessToken(code);
-//		String accessToken = accessTokenResponse.getAccess_token();
-//
-//		// 토큰으로 사용자 정보 받아오기
-//		KakaoMemberResponse kakaoMemberResponse = provider.getMemberInfo(accessToken);
-////		customOAuth2UserService.loadUser(null);
-//
-//		// 아이디가 없으면 회원가입, 있우면 로그인하기
-//		// 서버로부터 받은 응답을 UserDTO 형태로 응답
-//		return ResponseEntity.ok(userService.login(kakaoMemberResponse));
-//	}
-
-//	@GetMapping("/generate-token")
-//    public String generateToken(@RequestParam Long userId) {
-//        return jwtUtil.generateToken(userId);
-//    }
-//
-//	@GetMapping("/validate-token")
-//	public boolean validateToken(@RequestParam String token) {
-//		return jwtUtil.validateToken(token);
-//	}
-
-//	@Operation(summary = "네이버 로그인", description = "인가코드로 토큰을 받아오고 회원정보를 반환합니다")
-//	@ApiResponse(responseCode = "200", description = "요청 성공")
-//	@ApiResponse(responseCode = "400", description = "요청 실패")
-//	@PostMapping("/login/naver/v2")
-//	public ResponseEntity<NaverMemberResponse> naverloginV2(@RequestBody Map<String, String> requestBody)
-//			throws Exception {
-//
-//		String code = requestBody.get("code");
-//		// 액세스 토큰 받아오기
-//		AccessTokenResponse accessTokenResponse = provider.getNaverAccessTokenV2(code);
-//
-//		String accessToken = accessTokenResponse.getAccess_token();
-//
-//		// 토큰으로 사용자 정보 받아오기
-//		NaverMemberResponse naverMemberResponse = provider.getNaverInfo(accessToken);
-//
-//		// 아이디가 없으면 회원가입, 있우면 로그인하기
-//		// 서버로부터 받은 응답을 UserDTO 형태로 응답
-//		return ResponseEntity.ok(naverMemberResponse);
-//	}
-
-
-//	@Operation(summary = "통합 로그인", description = "카카오 또는 네이버 회원 정보를 가져옵니다")
-//	@ApiResponse(responseCode = "200", description = "요청 성공")
-//	@ApiResponse(responseCode = "400", description = "요청 실패")
-////	@PostMapping("/{domain}/login")
-//	public ResponseEntity<UserDTO> kakaoLogin(@RequestBody LoginRequest request, @PathVariable("provider") String provider)
-//			throws Exception {
-//
-//		String code = request.getCode();
-////		OAuthProvider provider = new OAuthProvider();
-//
-//		if (provider.equals("kakao")) {
-//
-//			// 액세스 토큰 받아오기
-//			AccessTokenResponse accessTokenResponse = oAuthProvider.getKakaoAccessToken(code);
-//			String accessToken = accessTokenResponse.getAccess_token();
-//			
-//			// 토큰으로 사용자 정보 받아오기
-//			KakaoMemberResponse kakaoMemberResponse = oAuthProvider.getMemberInfo(accessToken);
-//			// 아이디가 없으면 회원가입, 있우면 로그인하기
-//			// 서버로부터 받은 응답을 UserDTO 형태로 응답
-//			return ResponseEntity.ok(userService.login(kakaoMemberResponse));
-//		}
-//
-//		if (provider.equals("naver")) {
-//			System.out.println("도메인 : 네이버 인식 완료");
-//			AccessTokenResponse accessTokenResponse = oAuthProvider.getNaverAccessTokenV2(code);
-//			System.out.println("에세스 토큰 가져오기 성공");
-//			String accessToken = accessTokenResponse.getAccess_token();
-//			// 토큰으로 사용자 정보 받아오기
-//			
-//			NaverMemberResponse naverMemberResponse = oAuthProvider.getNaverInfo(accessToken);
-//			System.out.println("네이버 인포 가져오기 성공");
-//			return ResponseEntity.ok(userService.login(naverMemberResponse));
-//		}
-//		else return null;
-//	}

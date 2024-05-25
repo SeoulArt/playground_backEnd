@@ -2,7 +2,7 @@ package com.skybory.seoulArt.domain.ticket.entity;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.skybory.seoulArt.domain.event.entity.Event;
+import com.skybory.seoulArt.domain.play.entity.Play;
 import com.skybory.seoulArt.domain.seat.entity.Seat;
 import com.skybory.seoulArt.domain.user.entity.User;
 
@@ -42,17 +42,16 @@ public class Ticket {
 	
 	@ManyToOne		// 티켓이 이벤트의 주인이 됨
 	@JoinColumn
-//	@JsonIgnoreProperties({"ticket"})
-	private Event event;
+	private Play play;
 	
-	public void changeEvent(Event event) {
-		this.event = event;
-		event.getTicket().add(this);
+	public void changePlay(Play play) {
+		this.play = play;
+		play.getTicket().add(this);
 	}
 	
 	public void changeUser(User user) {
 		this.user = user;
-		user.getTickets().add(this);
+		user.getTicketList().add(this);
 	}
 
 	public void setTicketIdx(Long ticketIdx) {

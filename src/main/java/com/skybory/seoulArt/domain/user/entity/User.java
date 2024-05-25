@@ -1,18 +1,18 @@
 package com.skybory.seoulArt.domain.user.entity;
 
 import java.util.ArrayList;
+
 import java.util.List;
 
-import com.skybory.seoulArt.domain.reply.entity.Reply;
+import com.skybory.seoulArt.domain.reply.entity.QnA;
+//import com.skybory.seoulArt.domain.reply.entity.Reply;
+import com.skybory.seoulArt.domain.reply.entity.Review;
 import com.skybory.seoulArt.domain.ticket.entity.Ticket;
-import com.skybory.seoulArt.global.Dept;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.SequenceGenerator;
 import lombok.Getter;
 import lombok.Setter;
@@ -47,15 +47,23 @@ public class User {
     private String role;
     
     @OneToMany(mappedBy = "user")
-    private List<Ticket> tickets = new ArrayList<>();
+    private List<Ticket> ticketList = new ArrayList<>();
 		
+//    @OneToMany(mappedBy = "user")
+//    private List<Reply> replyList = new ArrayList<>();
+    
     @OneToMany(mappedBy = "user")
-    private List<Reply> replies = new ArrayList<>();
+    private List<Review> reviewList = new ArrayList<>();
+    
+    @OneToMany(mappedBy = "user")
+    private List<QnA> qnaList = new ArrayList<>();
     
     // creator 들만 사용해야함
-    private Dept department;	// "작품1" , "작품2", "작품3", 기획팀
+    private String department;	// 연출, 배우, 기획, 조명, 무대, 등 등
     private String profileImage;	// 창작자 프로필 사진
     private String creator_image;		// 창작자 게시글 사진
     private String creator_description;	// 창작자 소개(figma : '너무좋아요' 에 해당)
+    private String phoneNumber;
     
+    private String playList;	// 1번공연, 3번공연, 5번공연
 }

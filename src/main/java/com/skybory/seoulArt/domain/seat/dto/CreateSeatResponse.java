@@ -8,5 +8,5 @@ import lombok.Setter;
 public class CreateSeatResponse {
 
 	private long seatId;
-	private long eventId;
+	private long playId;
 }

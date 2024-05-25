@@ -26,5 +26,7 @@ public class NaverMemberResponse {
         private String email;
         private String profile_image;
         private String nickname;
+        // 0514 추가
+        private String mobile;
     }
 }

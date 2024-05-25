@@ -22,25 +22,30 @@ public class SeatServiceImpl implements SeatService {
 
 	@Override	// 좌석 생성 : 이벤트당 한번만 해야함
 	@Transactional
-	public List<CreateSeatResponse> createSeats(CreateSeatRequest request) {
+	public List<CreateSeatResponse> createSeats() {
 		
 		// 좌석 생성하기
-		int amount = request.getAmount();
+//		int amount = request.getAmount();
 //		long eventId = request.getEventId();
 		List<Seat> seatList = new ArrayList<>();
 
 		// 1~3번 이벤트까지 한번에 생성
 		for (Long j = 1L; j <= 6; j++) {
-			
-			for(Long i=1L; i<=amount; i++) {
-			Seat seat = new Seat();
-					seat.setSeatStatus(SeatStatus.AVAILABLE);
-//					seat.setSeatIdx(i);
-//					seat.setEventIdx(request.getEventId());
-					seat.setEventIdx(j);
-					seatList.add(seat);
-//					seatRepository.save(seat);
-				}
+		    long seatCount; // 각 경우에 따라 생성할 좌석의 수를 저장할 변수
+		    if (j == 1L || j == 2L) {
+		        seatCount = 72; // j가 1 또는 2일 경우, 72개의 좌석 생성
+		    } else if (j == 3L || j == 4L) {
+		        seatCount = 60; // j가 3 또는 4일 경우, 60개의 좌석 생성
+		    } else {
+		        seatCount = 72; // j가 5 또는 6일 경우, 72개의 좌석 생성
+		    }
+
+		    for (Long i = 1L; i <= seatCount; i++) {
+		        Seat seat = new Seat();
+		        seat.setSeatStatus(SeatStatus.AVAILABLE); // 모든 좌석을 'AVAILABLE' 상태로 설정
+		        seat.setPlayIdx(j); // 이벤트 인덱스를 j로 설정
+		        seatList.add(seat); // 생성된 좌석을 목록에 추가
+		    }
 		}
 		seatRepository.saveAll(seatList);
 
@@ -50,7 +55,7 @@ public class SeatServiceImpl implements SeatService {
 					CreateSeatResponse response = new CreateSeatResponse();
 					// 매핑
 //					response.setEventId(eventId);
-					response.setEventId(seat.getEventIdx());
+					response.setPlayId(seat.getPlayIdx());
 					response.setSeatId(seat.getSeatIdx());
 					return response;
 				})

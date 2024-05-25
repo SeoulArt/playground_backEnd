@@ -29,9 +29,10 @@ public enum ErrorCode {
     SEAT_UNAVAILABLE(400, "M005", "빈 자리가 없습니다."),
 //    PASSWORD_MISS_MATCH(400, "M006", "비밀번호가 일치하지 않습니다."),
 //
-    // Event
+    // PLAY
 //    PASSWORD_NULL_ERROR(400, "M001", "비밀번호가 없습니다."),
-    EVENT_NOT_FOUND(400, "E002", "없는 공연입니다."),
+    PLAY_NOT_FOUND(400, "E002", "없는 공연입니다."),
+    QNA_NOT_FOUND(400, "Q004", "QnA를 찾을 수 없습니다."),
     CREATOR_NOT_FOUND(400, "C002", "없는 창작자입니다."),
 //    USER_COUNT_NOT_FOUND(400, "M003", "해당 MemberCount가 존재하지 않습니다."),
 //    DUPLICATE_EMAIL(400, "M004", "이메일이 겹칩니다."),
