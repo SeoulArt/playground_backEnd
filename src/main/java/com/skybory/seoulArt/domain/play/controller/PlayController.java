@@ -35,7 +35,7 @@ public class PlayController {
 	
 	// 이벤트 생성 페이지 (관리자 권한) 김태연만 사용
 	@PostMapping("")		// postman 테스트 성공 0417
-//	@Secured("ROLE_ADMIN")
+	@Secured("ROLE_ADMIN")
 	@Operation(summary = "작품 등록", description = "작품을 등록합니다. 관리자 권한이 필요합니다")
 	@ApiResponse(responseCode="200", description="성공")
 	@ApiResponse(responseCode="400", description="에러")

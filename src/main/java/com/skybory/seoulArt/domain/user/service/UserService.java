@@ -9,10 +9,14 @@ import com.skybory.seoulArt.Oauth.dto.KakaoMemberResponse;
 import com.skybory.seoulArt.Oauth.dto.NaverMemberResponse;
 import com.skybory.seoulArt.domain.user.dto.CreatorIntroduceRequest;
 import com.skybory.seoulArt.domain.user.dto.CreatorIntroduceResponse;
+import com.skybory.seoulArt.domain.reply.dto.GetQuestionListResponse;
+import com.skybory.seoulArt.domain.reply.dto.ReviewResponse;
 import com.skybory.seoulArt.domain.user.dto.CreatorDetailResponse;
 import com.skybory.seoulArt.domain.user.dto.CreatorListResponse;
 import com.skybory.seoulArt.domain.user.dto.ImageRequest;
 import com.skybory.seoulArt.domain.user.dto.ImageResponse;
+import com.skybory.seoulArt.domain.user.dto.MyAnswerListResponse;
+import com.skybory.seoulArt.domain.user.dto.MyReviewListResponse;
 import com.skybory.seoulArt.domain.user.dto.UserDTO;
 import com.skybory.seoulArt.domain.user.dto.UserMobileRequest;
 import com.skybory.seoulArt.domain.user.dto.UserMobileResponse;
@@ -55,5 +59,11 @@ public interface UserService {
 			throws IOException;
 
 	ImageResponse putProfileImage(ImageRequest request, HttpServletRequest requestServlet) throws IOException;
+	
+	List<GetQuestionListResponse> getMyQuestionList(HttpServletRequest requestServlet);
+
+	List<MyReviewListResponse> getMyReviewList(HttpServletRequest requestServlet);
+
+	List<MyAnswerListResponse> getMyAnswerList(HttpServletRequest requestServlet);
 	
 }

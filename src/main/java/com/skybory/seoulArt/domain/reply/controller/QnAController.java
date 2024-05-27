@@ -18,9 +18,10 @@ import com.skybory.seoulArt.domain.reply.dto.PutQuestionRequest;
 import com.skybory.seoulArt.domain.reply.dto.PutQuestionResponse;
 import com.skybory.seoulArt.domain.reply.dto.QnAResponse;
 import com.skybory.seoulArt.domain.reply.dto.QuestionRequest;
-import com.skybory.seoulArt.domain.reply.dto.QuestionResponse;
+import com.skybory.seoulArt.domain.reply.dto.GetQuestionListResponse;
 import com.skybory.seoulArt.domain.reply.dto.AnswerRequest;
 import com.skybory.seoulArt.domain.reply.dto.AnswerResponse;
+import com.skybory.seoulArt.domain.reply.dto.PostQuestionResponse;
 import com.skybory.seoulArt.domain.reply.service.QnAService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -38,30 +39,30 @@ public class QnAController {
 	private final QnAService qnaService;
 
 	@PostMapping("/question/{playId}")	// 완성
-	@Secured({"ROLE_USER", "ROLE_ADMIN", "ROLE_CREATOR", "ROLE_EDITOR"})
+	@Secured({"ROLE_USER", "ROLE_ADMIN", "ROLE_CREATOR"})
 	@Operation(summary = "질문 생성", description = "질문을 생성합니다")
 	@ApiResponse(responseCode="200", description="성공")
 	@ApiResponse(responseCode="400", description="에러")
-	public ResponseEntity<QuestionResponse> postQuestion(@RequestBody QuestionRequest request, HttpServletRequest servletRequest, @PathVariable("playId") Long playId) throws IOException {
+	public ResponseEntity<PostQuestionResponse> postQuestion(@RequestBody QuestionRequest request, HttpServletRequest servletRequest, @PathVariable("playId") Long playId) throws IOException {
 		return ResponseEntity.ok(qnaService.postQuestion(request, servletRequest, playId));
 	}
 
-	@PostMapping("/answer/{questionId}")	// 완성
-	@Secured({"ROLE_USER", "ROLE_ADMIN", "ROLE_CREATOR", "ROLE_EDITOR"})
+	@PostMapping("/answer/{qnaId}")	// 완성
+	@Secured({"ROLE_ADMIN", "ROLE_CREATOR"})
 	@Operation(summary = "답변 생성", description = "답변을 생성합니다")
 	@ApiResponse(responseCode="200", description="성공")
 	@ApiResponse(responseCode="400", description="에러")
-	public ResponseEntity<AnswerResponse> postAnswer(@RequestBody AnswerRequest request, HttpServletRequest servletRequest, @PathVariable("questionId") Long questionId) throws IOException {
-		return ResponseEntity.ok(qnaService.postAnswer(request, servletRequest, questionId));
+	public ResponseEntity<AnswerResponse> postAnswer(@RequestBody AnswerRequest request, HttpServletRequest servletRequest, @PathVariable("qnaId") Long qnaId) throws IOException {
+		return ResponseEntity.ok(qnaService.postAnswer(request, servletRequest, qnaId));
 	}
 	
 	
-	@GetMapping("/{questionId}")
+	@GetMapping("/{qnaId}")
 	@Operation(summary = "질문 상세정보 조회", description = "질문 상세정보를 조회합니다")
 	@ApiResponse(responseCode="200", description="성공")
 	@ApiResponse(responseCode="400", description="에러")
-	public ResponseEntity<QnAResponse> getQuestionDetail(@Parameter(description = "후기 id") @PathVariable("questionId") Long questionId) {
-		return ResponseEntity.ok(qnaService.getQnA(questionId));
+	public ResponseEntity<QnAResponse> getQuestionDetail(@Parameter(description = "후기 id") @PathVariable("qnaId") Long qnaId, HttpServletRequest request) {
+		return ResponseEntity.ok(qnaService.getQnA(qnaId, request));
 	}
 	
 	
@@ -69,37 +70,37 @@ public class QnAController {
 	@Operation(summary = "질문 목록 조회", description = "playId 로 검색해서 해당 공연의 모든 질문 목록을 조회합니다")
 	@ApiResponse(responseCode="200", description="성공")
 	@ApiResponse(responseCode="400", description="에러")
-	public ResponseEntity<List<QuestionResponse>> getQuestionList(@PathVariable("playId") Long playId) {
+	public ResponseEntity<List<GetQuestionListResponse>> getQuestionList(@PathVariable("playId") Long playId) {
 		log.info("후기 목록을 조회합니다");
 		return ResponseEntity.ok(qnaService.getQuestionList(playId));
 	}
 	
 	
-	@PutMapping("/question/{questionId}")	// 완성
-	@Secured({"ROLE_USER", "ROLE_ADMIN", "ROLE_CREATOR", "ROLE_EDITOR"})
+	@PutMapping("/question/{qnaId}")	// 완성
+	@Secured({"ROLE_USER", "ROLE_ADMIN", "ROLE_CREATOR"})
 	@Operation(summary = "질문 수정", description = "질문을 수정합니다")
 	@ApiResponse(responseCode="200", description="성공")
 	@ApiResponse(responseCode="400", description="에러")
-	public ResponseEntity<PutQuestionResponse> putQuestion(@RequestBody PutQuestionRequest request, HttpServletRequest servletRequest, @PathVariable("questionId") Long questionId) throws IOException {
-		return ResponseEntity.ok(qnaService.putQuestion(request, servletRequest, questionId));
+	public ResponseEntity<PutQuestionResponse> putQuestion(@RequestBody PutQuestionRequest request, HttpServletRequest servletRequest, @PathVariable("qnaId") Long qnaId) throws IOException {
+		return ResponseEntity.ok(qnaService.putQuestion(request, servletRequest, qnaId));
 	}
 	
-	@PutMapping("/answer/{questionId}")	// 완성
-	@Secured({"ROLE_USER", "ROLE_ADMIN", "ROLE_CREATOR", "ROLE_EDITOR"})
+	@PutMapping("/answer/{qnaId}")	// 완성
+	@Secured({"ROLE_USER", "ROLE_CREATOR", "ROLE_ADMIN"})
 	@Operation(summary = "답변 수정", description = "답변을 수정합니다")
 	@ApiResponse(responseCode="200", description="성공")
 	@ApiResponse(responseCode="400", description="에러")
-	public ResponseEntity<PutAnswerResponse> putAnswer(@RequestBody PutAnswerRequest request, HttpServletRequest servletRequest, @PathVariable("questionId") Long questionId) throws IOException {
-		return ResponseEntity.ok(qnaService.putAnswer(request, servletRequest, questionId));
+	public ResponseEntity<PutAnswerResponse> putAnswer(@RequestBody PutAnswerRequest request, HttpServletRequest servletRequest, @PathVariable("qnaId") Long qnaId) throws IOException {
+		return ResponseEntity.ok(qnaService.putAnswer(request, servletRequest, qnaId));
 	}
 	
-	@DeleteMapping("/{questionId}")
-	@Secured({"ROLE_USER", "ROLE_ADMIN" , "ROLE_CREATOR" , "ROLE_EDITOR"})
+	@DeleteMapping("/{qnaId}")
+	@Secured({"ROLE_USER", "ROLE_ADMIN" , "ROLE_CREATOR"})
 	@Operation(summary = "질문 삭제", description = "질문을 삭제합니다")
 	@ApiResponse(responseCode="200", description="성공")
 	@ApiResponse(responseCode="400", description="에러")
-	public ResponseEntity<String> deleteQuestion(@Parameter(description = "댓글 id") @PathVariable("questionId") Long questionId, HttpServletRequest requestServlet) {
-		return ResponseEntity.ok(qnaService.deleteQnA(questionId, requestServlet));
+	public ResponseEntity<String> deleteQuestion(@Parameter(description = "댓글 id") @PathVariable("qnaId") Long qnaId, HttpServletRequest requestServlet) {
+		return ResponseEntity.ok(qnaService.deleteQnA(qnaId, requestServlet));
 	}
 	
 

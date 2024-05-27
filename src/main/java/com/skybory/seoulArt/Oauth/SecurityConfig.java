@@ -58,7 +58,7 @@ public class SecurityConfig {
 
 		http.authorizeHttpRequests(	
 				(auth) -> auth
-			    .requestMatchers("/", "/api/seat/**","/api/reply/**", "/api/user/**", "/api/auth/**", "/swagger-ui/**", "/v3/api-docs/**" , "/api/play/**", "/api/ticket/**", "/api/review/**"  ).permitAll() // /api/auth/ 하위 경로에 대한 접근을 모두 허용
+			    .requestMatchers("/", "/api/seat/**","/api/reply/**", "/api/user/**", "/api/auth/**", "/swagger-ui/**", "/v3/api-docs/**" , "/api/play/**", "/api/ticket/**", "/api/review/**" , "/api/qna/**" ).permitAll() // /api/auth/ 하위 경로에 대한 접근을 모두 허용
 			    .anyRequest().authenticated())
 				.addFilterBefore(new JwtAuthenticationFilter(userService,jwtUtil), UsernamePasswordAuthenticationFilter.class);
 		return http.build();

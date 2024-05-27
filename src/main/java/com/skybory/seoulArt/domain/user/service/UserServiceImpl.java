@@ -19,10 +19,18 @@ import com.skybory.seoulArt.Oauth.dto.KakaoMemberResponse;
 import com.skybory.seoulArt.Oauth.dto.NaverMemberResponse;
 import com.skybory.seoulArt.domain.user.dto.CreatorIntroduceRequest;
 import com.skybory.seoulArt.domain.user.dto.CreatorIntroduceResponse;
+import com.skybory.seoulArt.domain.reply.dto.GetQuestionListResponse;
+import com.skybory.seoulArt.domain.reply.dto.ReviewResponse;
+import com.skybory.seoulArt.domain.reply.entity.QnA;
+import com.skybory.seoulArt.domain.reply.entity.Review;
+import com.skybory.seoulArt.domain.reply.repository.QnARepository;
+import com.skybory.seoulArt.domain.reply.repository.ReviewRepository;
 import com.skybory.seoulArt.domain.user.dto.CreatorDetailResponse;
 import com.skybory.seoulArt.domain.user.dto.CreatorListResponse;
 import com.skybory.seoulArt.domain.user.dto.ImageRequest;
 import com.skybory.seoulArt.domain.user.dto.ImageResponse;
+import com.skybory.seoulArt.domain.user.dto.MyAnswerListResponse;
+import com.skybory.seoulArt.domain.user.dto.MyReviewListResponse;
 import com.skybory.seoulArt.domain.user.dto.UserDTO;
 import com.skybory.seoulArt.domain.user.dto.UserMobileRequest;
 import com.skybory.seoulArt.domain.user.dto.UserMobileResponse;
@@ -42,12 +50,15 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 public class UserServiceImpl implements UserService {
 
-	@Autowired
-	private JwtUtil jwtUtil;
+//	@Autowired
+	private final JwtUtil jwtUtil;
 
-	@Autowired
+//	@Autowired
 	private final UserRepository userRepository;
 
+	private final QnARepository qnaRepository;
+	private final ReviewRepository reviewRepository;
+	
 	private final FileUploadService fileUploadService;
 
 //    public UserDTO getCurrentUser(HttpServletRequest request) {
@@ -86,7 +97,7 @@ public class UserServiceImpl implements UserService {
 		// 부서가 없으면 검색되지 않음.
 //	    		.filter(creator -> creator.getDepartment() != null)
 				// ROLE_CREATOR 가 아니면 검색되지 않음
-				.filter(creator -> creator.getRole().equals("ROLE_CREATOR"))
+				.filter(creator -> creator.getRole().equals("ROLE_CREATOR") || creator.getRole().equals("ROLE_EDITOR"))
 
 				.map(creator -> {
 					CreatorListResponse response = new CreatorListResponse();
@@ -214,6 +225,7 @@ public class UserServiceImpl implements UserService {
 			response.setPhoneNumber(user.getPhoneNumber());
 			response.setDescription(user.getCreator_description());
 			response.setPlayList(user.getPlayList());
+			response.setEditor(user.isEditor());
 			// 사용자의 티켓 검사해서 이벤트아이디 반환
 			List<Map<String, Long>> ticketPlayPairs = user.getTicketList().stream().map(ticket -> {
 				Map<String, Long> pair = new HashMap<>();
@@ -252,6 +264,7 @@ public class UserServiceImpl implements UserService {
 			response.setPhoneNumber(user.getPhoneNumber());
 			response.setDescription(user.getCreator_description());
 			response.setPlayList(user.getPlayList());
+			response.setEditor(user.isEditor());
 			// 사용자의 티켓 검사해서 이벤트아이디 반환
 			List<Map<String, Long>> ticketPlayPairs = user.getTicketList().stream().map(ticket -> {
 				Map<String, Long> pair = new HashMap<>();
@@ -285,6 +298,7 @@ public class UserServiceImpl implements UserService {
 		userDTO.setPhoneNumber(user.getPhoneNumber());
 		userDTO.setDescription(user.getCreator_description());
 		userDTO.setPlayList(user.getPlayList());
+		userDTO.setEditor(user.isEditor());
 		// 사용자의 티켓 검사해서 이벤트아이디 반환
 		// 사용자의 티켓 검사해서 티켓 ID와 이벤트 ID의 쌍을 반환
 		List<Map<String, Long>> ticketPlayPairs = user.getTicketList().stream().map(ticket -> {
@@ -423,5 +437,92 @@ public class UserServiceImpl implements UserService {
 		}
 		return response;
 
+	}
+
+	@Override
+	public List<GetQuestionListResponse> getMyQuestionList(HttpServletRequest requestServlet) {
+		User user = findUserByHeader(requestServlet);
+		List<QnA> qnas = qnaRepository.findQnasByUser_Id(user.getId());
+		
+	    List<GetQuestionListResponse> response = qnas.stream()
+	            .map(qna -> {
+	                boolean isAnswered = qna.getAnswer() != null; // 답변 여부 확인
+	                return new GetQuestionListResponse(
+	                		qna.getQnaId(),
+	                    qna.getQuestion(),
+	                    isAnswered
+	                );
+	            }).collect(Collectors.toList());
+
+	        return response;
+	}
+
+	@Override
+	public List<MyReviewListResponse> getMyReviewList(HttpServletRequest requestServlet) {
+		User user = findUserByHeader(requestServlet);
+		List<Review> reviews = reviewRepository.findByUser_Id(user.getId());
+		
+		
+		List<MyReviewListResponse> responseList = reviews.stream().map(review -> {
+			MyReviewListResponse response = new MyReviewListResponse();
+
+			// 매핑
+			response.setReviewId(review.getReviewId());
+			response.setContent(review.getContent());
+			response.setImage(review.getImage());
+			return response;
+		}).collect(Collectors.toList());
+		return responseList;
+	}
+
+	@Override
+	public List<MyAnswerListResponse> getMyAnswerList(HttpServletRequest requestServlet) {
+		User user = findUserByHeader(requestServlet);
+	
+		// admin 이면 전부 다 보이고, isEditor 가 true 이면 자기꺼만 보이게 할까? 응 그러자.
+		if (user.getRole() == "ROLE_ADMIN") {
+			List<QnA> qnas = qnaRepository.findQnasByUser_Id(user.getId());
+			List<MyAnswerListResponse> response = qnas.stream()
+		            .map(qna -> 
+		                new MyAnswerListResponse(
+		                		qna.getQnaId(),
+		                    qna.getQuestion()
+		                )
+		            ).collect(Collectors.toList());
+			return response;
+		}
+		// 에디터라면
+		else if (user.isEditor()) {
+			Long playId = Long.parseLong(user.getPlayList());
+			List<QnA> qnas = qnaRepository.findByPlayPlayId(playId);
+			
+			List<MyAnswerListResponse> response = qnas.stream()
+		            .map(qna -> 
+		                new MyAnswerListResponse(
+		                		qna.getQnaId(),
+		                    qna.getAnswer()
+		                )
+		            ).collect(Collectors.toList());
+			return response;
+		}
+		
+		else {
+			throw new ServiceException(ErrorCode.HANDLE_ACCESS_DENIED);
+		}
+	}
+	
+	public List<GetQuestionListResponse> getQuestionList(Long playId) {
+		List<QnA> qnas = qnaRepository.findByPlayPlayId(playId);
+	    List<GetQuestionListResponse> response = qnas.stream()
+	            .map(qna -> {
+	                boolean isAnswered = qna.getAnswer() != null; // 답변 여부 확인
+	                return new GetQuestionListResponse(
+	                		qna.getQnaId(),
+	                    qna.getQuestion(),
+	                    isAnswered
+	                );
+	            }).collect(Collectors.toList());
+
+	        return response;
 	}
 }

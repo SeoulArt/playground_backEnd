@@ -219,7 +219,9 @@
 package com.skybory.seoulArt.domain.reply.service;
 
 import java.io.IOException;
+
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -238,13 +240,14 @@ import com.skybory.seoulArt.domain.play.repository.PlayRepository;
 import com.skybory.seoulArt.domain.reply.dto.AnswerRequest;
 import com.skybory.seoulArt.domain.reply.dto.AnswerResponse;
 import com.skybory.seoulArt.domain.reply.dto.CreateReviewRequest;
+import com.skybory.seoulArt.domain.reply.dto.PostQuestionResponse;
 import com.skybory.seoulArt.domain.reply.dto.PutAnswerRequest;
 import com.skybory.seoulArt.domain.reply.dto.PutAnswerResponse;
 import com.skybory.seoulArt.domain.reply.dto.PutQuestionRequest;
 import com.skybory.seoulArt.domain.reply.dto.PutQuestionResponse;
 import com.skybory.seoulArt.domain.reply.dto.QnAResponse;
 import com.skybory.seoulArt.domain.reply.dto.QuestionRequest;
-import com.skybory.seoulArt.domain.reply.dto.QuestionResponse;
+import com.skybory.seoulArt.domain.reply.dto.GetQuestionListResponse;
 import com.skybory.seoulArt.domain.reply.dto.ReviewResponse;
 import com.skybory.seoulArt.domain.reply.entity.QnA;
 import com.skybory.seoulArt.domain.reply.entity.Review;
@@ -254,7 +257,6 @@ import com.skybory.seoulArt.domain.user.dto.CreatorIntroduceRequest;
 import com.skybory.seoulArt.domain.user.dto.CreatorIntroduceResponse;
 import com.skybory.seoulArt.domain.user.dto.ImageRequest;
 import com.skybory.seoulArt.domain.user.dto.ImageResponse;
-import com.skybory.seoulArt.domain.user.dto.ReplyImageRequest;
 import com.skybory.seoulArt.domain.user.dto.UserDTO;
 import com.skybory.seoulArt.domain.user.entity.User;
 import com.skybory.seoulArt.domain.user.repository.UserRepository;
@@ -272,124 +274,165 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 @Transactional(readOnly = true)
 public class QnAServiceImpl implements QnAService {
-	
+
 	private final QnARepository qnaRepository;
 	private final UserRepository userRepository;
 	private final JwtUtil jwtUtil;
 	private final PlayRepository playRepository;
+
 	@Override
 	@Transactional
-	public QuestionResponse postQuestion(QuestionRequest request, HttpServletRequest servletRequest, Long playId)
+	public PostQuestionResponse postQuestion(QuestionRequest request, HttpServletRequest servletRequest, Long playId)
 			throws IOException {
 
+		// currentUser 찾기
 		User user = findUserByHeader(servletRequest);
 		Play play = playRepository.findById(playId).orElseThrow(() -> new ServiceException(ErrorCode.PLAY_NOT_FOUND));
 		QnA qna = new QnA();
+
+		if(user.getPlayList() == null) {
+			throw new ServiceException(ErrorCode.HANDLE_ACCESS_DENIED);
+		}
+		
+		// playList 문자열을 쉼표로 분할하고 리스트로 변환
+	    List<String> userPlayIds = Arrays.asList(user.getPlayList().split(","));
+		// 내 작품에는 질문 못해야해
+	    if (userPlayIds.contains(String.valueOf(playId))) {
+	        throw new ServiceException(ErrorCode.HANDLE_ACCESS_DENIED);
+	    }
 		
 		qna.setUser(user);
-		qna.setQuestionComment(request.getComment());
+		qna.setQuestion(request.getQuestion());
 		qna.setPlay(play);
 		qnaRepository.save(qna);
-		
-		QuestionResponse response = new QuestionResponse();
-		
-		response.setUserName(user.getUsername());
-		response.setProfileImage(user.getProfileImage());
-		response.setComment(request.getComment());
-		
+
+		PostQuestionResponse response = new PostQuestionResponse();
+
+//		response.setUsername(user.getUsername());
+//		response.setProfileImage(user.getProfileImage());
+//		response.setQuestion(request.getComment());
+		response.setQnaId(qna.getQnaId());
+
 		return response;
 	}
 
 	@Override
 	@Transactional
-	public AnswerResponse postAnswer(AnswerRequest request, HttpServletRequest servletRequest, Long questionId) throws IOException {
-		
+	public AnswerResponse postAnswer(AnswerRequest request, HttpServletRequest servletRequest, Long questionId)
+			throws IOException {
+
 		User user = findUserByHeader(servletRequest);
-		QnA qna = qnaRepository.findById(questionId).orElseThrow(()-> new ServiceException(ErrorCode.ENTITY_NOT_FOUND));
-		
-		if (!user.getRole().equals("ROLE_EDITOR") && !user.getRole().equals("ROLE_ADMIN")) {
+		QnA qna = qnaRepository.findById(questionId)
+				.orElseThrow(() -> new ServiceException(ErrorCode.ENTITY_NOT_FOUND));
+
+		if (!user.isEditor() && !user.getRole().equals("ROLE_ADMIN")) {
 			throw new ServiceException(ErrorCode.HANDLE_ACCESS_DENIED);
 		}
-		
+
 		// 엔티티 저장
-		String comment = request.getComment();
-		qna.setAnswerComment(comment);
-		
+		String answer = request.getAnswer();
+		qna.setAnswer(answer);
+
 		// response 생성
 		AnswerResponse response = new AnswerResponse();
-		response.setComment(comment);
+		response.setQnaId(questionId);
+//		response.setAnswer(answer);
 		return response;
 	}
 
-	
 	@Override
-	public QnAResponse getQnA(Long qnaId) {
+	public QnAResponse getQnA(Long qnaId, HttpServletRequest request) {
 		QnA qna = qnaRepository.findById(qnaId).orElseThrow(() -> new ServiceException(ErrorCode.QNA_NOT_FOUND));
-		String questionComment = qna.getQuestionComment();
-		String answerComment = qna.getAnswerComment();
+		String question = qna.getQuestion();
+		String answer = qna.getAnswer();
+		User currentUser = findUserByHeader(request);
+		Long playId = qna.getPlay().getPlayId();
+		boolean isAuthor = qna.getUser().getId() == currentUser.getId();
 		
 		QnAResponse response = new QnAResponse();
-		response.setQuestionComment(questionComment);
-		response.setAnswerComment(answerComment);
+		response.setQuestion(question);
+		response.setAnswer(answer);
+		response.setAuthor(isAuthor);
+		response.setPlayId(playId);
 		return response;
 	}
 
 	@Override
-	public List<QuestionResponse> getQuestionList(Long playId) {
-	    List<QnA> qnas = qnaRepository.findByPlayPlayId(playId);
-	    List<QuestionResponse> response = qnas.stream()
-	               .map(qna -> new QuestionResponse(qna.getUser().getUsername(), qna.getUser().getProfileImage(), qna.getQuestionComment()))
-	               .collect(Collectors.toList());
-	    		
-	    return response;
+	public List<GetQuestionListResponse> getQuestionList(Long playId) {
+		List<QnA> qnas = qnaRepository.findByPlayPlayId(playId);
+	    List<GetQuestionListResponse> response = qnas.stream()
+	            .map(qna -> {
+	                boolean isAnswered = qna.getAnswer() != null; // 답변 여부 확인
+	                return new GetQuestionListResponse(
+	                		qna.getQnaId(),
+	                    qna.getQuestion(),
+	                    isAnswered
+	                );
+	            }).collect(Collectors.toList());
+
+	        return response;
 	}
 
 	@Override
 	@Transactional
 	public PutQuestionResponse putQuestion(PutQuestionRequest request, HttpServletRequest requestServlet,
 			Long questionId) throws IOException {
-		 User user = findUserByHeader(requestServlet);
-		 QnA qna = qnaRepository.findById(questionId).orElseThrow(() -> new ServiceException(ErrorCode.QNA_NOT_FOUND));
-		
-		 if (!qna.getUser().getId().equals(user.getId())) {
-		        throw new ServiceException(ErrorCode.HANDLE_ACCESS_DENIED);
-		    }
-		 
-		 qna.setQuestionComment(request.getComment());
-		 qnaRepository.save(qna);
-		 PutQuestionResponse response = new PutQuestionResponse(questionId, request.getComment());
-		 
-		 return response;
+		User user = findUserByHeader(requestServlet);
+		String role = user.getRole();
+		QnA qna = qnaRepository.findById(questionId).orElseThrow(() -> new ServiceException(ErrorCode.QNA_NOT_FOUND));
+
+		if (!role.equals("ROLE_ADMIN")) {
+			// admin 이 아니면 본인확인
+			if (!qna.getUser().getId().equals(user.getId())) {
+				throw new ServiceException(ErrorCode.HANDLE_ACCESS_DENIED);
+			}
+		}
+
+		qna.setQuestion(request.getQuestion());
+		qnaRepository.save(qna);
+//		PutAnswerResponse response = new PutAnswerResponse(questionId, request.getQuestion());
+		PutQuestionResponse response = new PutQuestionResponse(questionId);
+
+		return response;
 	}
 
 	@Override
 	@Transactional
 	public PutAnswerResponse putAnswer(PutAnswerRequest request, HttpServletRequest requestServlet, Long questionId) {
-	    User user = findUserByHeader(requestServlet);
-	    QnA qna = qnaRepository.findById(questionId).orElseThrow(() -> new ServiceException(ErrorCode.ENTITY_NOT_FOUND));
-	    
-	    if (!user.getRole().equals("ROLE_EDITOR") && !user.getRole().equals("ROLE_ADMIN")) {
+		User user = findUserByHeader(requestServlet);
+		QnA qna = qnaRepository.findById(questionId)
+				.orElseThrow(() -> new ServiceException(ErrorCode.ENTITY_NOT_FOUND));
+
+//		if (!user.isEditor() && !user.getRole().equals("ROLE_ADMIN")) {
+//			throw new ServiceException(ErrorCode.HANDLE_ACCESS_DENIED);
+//		}
+		
+	    // 조건 추가: ADMIN은 언제든지, Editor는 playList 값과 playId 값이 일치할 경우에만 수정 가능
+	    if (!(user.getRole().equals("ROLE_ADMIN") ||
+	          (user.isEditor() && user.getPlayList() != null && qna.getPlay().getPlayId() != null &&
+	           user.getPlayList().equals(qna.getPlay().getPlayId().toString())))) {
 	        throw new ServiceException(ErrorCode.HANDLE_ACCESS_DENIED);
 	    }
-	    qna.setAnswerComment(request.getComment());
-	    qnaRepository.save(qna);
-	    
-	    PutAnswerResponse response = new PutAnswerResponse(questionId, request.getComment());
+		qna.setAnswer(request.getAnswer());
+		qnaRepository.save(qna);
+
+//		PutAnswerResponse response = new PutAnswerResponse(questionId, request.getAnswer());
+		PutAnswerResponse response = new PutAnswerResponse(questionId);
 		return response;
 	}
 
 	@Override
 	@Transactional
 	public String deleteQnA(Long qnaId, HttpServletRequest requestServlet) {
-	    User user = findUserByHeader(requestServlet);
-	    QnA qna = qnaRepository.findById(qnaId).orElseThrow(() -> new ServiceException(ErrorCode.ENTITY_NOT_FOUND));
-	    
-	    if (!qna.getUser().getId().equals(user.getId()) && !user.getRole().equals("ROLE_ADMIN")) {
-	        throw new ServiceException(ErrorCode.HANDLE_ACCESS_DENIED);
-	    }
-	    
-	    qnaRepository.delete(qna);
-	    return "QnA 삭제 성공";
+		User user = findUserByHeader(requestServlet);
+		QnA qna = qnaRepository.findById(qnaId).orElseThrow(() -> new ServiceException(ErrorCode.ENTITY_NOT_FOUND));
+
+		if (!qna.getUser().getId().equals(user.getId()) && !user.getRole().equals("ROLE_ADMIN")) {
+			throw new ServiceException(ErrorCode.HANDLE_ACCESS_DENIED);
+		}
+
+		qnaRepository.delete(qna);
+		return "QnA 삭제 성공";
 	}
 
 	@Override
@@ -401,5 +444,5 @@ public class QnAServiceImpl implements QnAService {
 		User user = userRepository.findById(userId).orElseThrow(() -> new ServiceException(ErrorCode.USER_NOT_FOUND));
 		return user;
 	}
- 
+
 }

@@ -7,5 +7,6 @@ import lombok.Setter;
 @Setter
 public class AnswerResponse {
 
-	private String comment;
+//	private String answer;
+	private Long qnaId;
 }

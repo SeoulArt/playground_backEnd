@@ -7,10 +7,10 @@ import lombok.Setter;
 @Setter
 public class PutAnswerResponse {
 
-	public PutAnswerResponse(Long questionId, String comment) {
-		this.questionId = questionId;
-		this.comment = comment;
+	public PutAnswerResponse(Long qnaId) {
+		this.qnaId = qnaId;
+//		this.answer = answer;
 	}
-	private Long questionId;
-	private String comment;
+	private Long qnaId;
+//	private String answer;
 }

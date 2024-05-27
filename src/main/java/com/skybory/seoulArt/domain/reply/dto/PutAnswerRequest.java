@@ -7,6 +7,6 @@ import lombok.Setter;
 @Setter
 public class PutAnswerRequest {
 
-	private Long questionId;
-	private String comment;
+//	private Long questionId;
+	private String answer;
 }

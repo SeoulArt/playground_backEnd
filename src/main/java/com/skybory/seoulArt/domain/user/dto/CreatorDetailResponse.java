@@ -10,7 +10,7 @@ import lombok.Setter;
 @Setter
 public class CreatorDetailResponse {
 
-	private Long id;
+//	private Long id;
 	private String username;
 	private String department;
 	private String image;

@@ -103,9 +103,9 @@ public class QnA {
 	private Play play;
 	
 	
-	private String questionComment;
+	private String question;
 
-	private String answerComment;
+	private String answer;
 	
 	
 	public void changePlay(Play play) {

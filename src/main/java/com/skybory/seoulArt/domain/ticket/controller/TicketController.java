@@ -1,7 +1,12 @@
 package com.skybory.seoulArt.domain.ticket.controller;
 
+import java.time.LocalDateTime;
+import java.time.Month;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -50,8 +55,22 @@ public class TicketController {
 	@Operation(summary = "티켓 예매하기", description = "티켓을 예매합니다")
 	@ApiResponse(responseCode="200", description="성공")
 	@ApiResponse(responseCode="400", description="커스텀 에러 발생", content = @Content(schema = @Schema(implementation = ApiError.class)))
-	public ResponseEntity<CreateTicketResponse> create(@RequestBody CreateTicketRequest request, HttpServletRequest requestServlet) {
-		return ResponseEntity.ok(ticketService.create(request,requestServlet));
+	public ResponseEntity<Object> create(@RequestBody CreateTicketRequest request, HttpServletRequest requestServlet) {
+//		return ResponseEntity.ok(ticketService.create(request,requestServlet));
+//        LocalDateTime now = LocalDateTime.now();
+//        LocalDateTime activationTime = LocalDateTime.of(2024, Month.MAY, 27, 22, 4, 59);
+		
+	    ZonedDateTime now = ZonedDateTime.now(ZoneId.of("Asia/Seoul"));
+	    ZonedDateTime activationTime = ZonedDateTime.of(2024, 5, 28, 16, 41, 50, 0, ZoneId.of("Asia/Seoul"));
+	    System.out.println(now);
+
+        if (now.isBefore(activationTime)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("예매 시작 전입니다.");
+        }
+        else {
+        	return ResponseEntity.ok(ticketService.create(request,requestServlet));
+        }
+
 	}
 
 

@@ -18,5 +18,5 @@ public class UserDTO {
 	private String description;
 	private String playList;
 //	private String name;
-	
+	private boolean isEditor;
 }

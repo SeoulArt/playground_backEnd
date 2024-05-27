@@ -66,4 +66,6 @@ public class User {
     private String phoneNumber;
     
     private String playList;	// 1번공연, 3번공연, 5번공연
+    
+    private boolean isEditor;
 }

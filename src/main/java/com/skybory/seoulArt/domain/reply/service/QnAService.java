@@ -49,9 +49,10 @@ import com.skybory.seoulArt.domain.reply.dto.PutQuestionRequest;
 import com.skybory.seoulArt.domain.reply.dto.PutQuestionResponse;
 import com.skybory.seoulArt.domain.reply.dto.QnAResponse;
 import com.skybory.seoulArt.domain.reply.dto.QuestionRequest;
-import com.skybory.seoulArt.domain.reply.dto.QuestionResponse;
+import com.skybory.seoulArt.domain.reply.dto.GetQuestionListResponse;
 import com.skybory.seoulArt.domain.reply.dto.AnswerRequest;
 import com.skybory.seoulArt.domain.reply.dto.AnswerResponse;
+import com.skybory.seoulArt.domain.reply.dto.PostQuestionResponse;
 import com.skybory.seoulArt.domain.user.entity.User;
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -59,16 +60,16 @@ import jakarta.servlet.http.HttpServletRequest;
 public interface QnAService {
 
 	// POST
-	QuestionResponse postQuestion(QuestionRequest request, HttpServletRequest servletRequest, Long playId) throws IOException;
+	PostQuestionResponse postQuestion(QuestionRequest request, HttpServletRequest servletRequest, Long playId) throws IOException;
 
 	AnswerResponse postAnswer(AnswerRequest request,HttpServletRequest servletRequest, Long questionId) throws IOException;
 
 	
 	// GET
-	QnAResponse getQnA(Long qnaId);
+	QnAResponse getQnA(Long qnaId, HttpServletRequest request);
 	//	AnswerResponse getAnswer(Long answerId);	// 이 부분은 getQnA 에 속해있음
 	
-	List<QuestionResponse> getQuestionList(Long playId);
+	List<GetQuestionListResponse> getQuestionList(Long playId);
 
 	// PUT
 	PutQuestionResponse putQuestion(PutQuestionRequest request, HttpServletRequest requestServlet, Long questionId)

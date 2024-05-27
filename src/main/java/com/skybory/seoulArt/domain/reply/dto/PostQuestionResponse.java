@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class AnswerRequest {
+public class PostQuestionResponse {
 
-	private String answer;
+	private Long qnaId;
 }

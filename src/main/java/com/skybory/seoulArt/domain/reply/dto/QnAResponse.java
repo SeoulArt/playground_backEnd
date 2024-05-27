@@ -7,6 +7,8 @@ import lombok.Setter;
 @Setter
 public class QnAResponse {
 
-	private String questionComment;
-	private String answerComment;
+	private String question;
+	private String answer;
+	private boolean isAuthor;
+	private Long playId;
 }

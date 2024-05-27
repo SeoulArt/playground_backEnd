@@ -38,9 +38,11 @@ public class Review {
 	@JoinColumn(name = "play_Id")
 	private Play play;
 	
-	private String comment;
+	private String content;
 	
 	private String image;
+	
+	private String title;
 	
 	public void changePlay(Play play) {
 		this.play = play;

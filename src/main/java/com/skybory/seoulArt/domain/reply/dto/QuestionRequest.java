@@ -7,5 +7,5 @@ import lombok.Setter;
 @Setter
 public class QuestionRequest {
 
-	private String comment;
+	private String question;
 }

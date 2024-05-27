@@ -17,12 +17,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.skybory.seoulArt.domain.play.controller.PlayController;
+import com.skybory.seoulArt.domain.reply.dto.GetQuestionListResponse;
+import com.skybory.seoulArt.domain.reply.dto.ReviewResponse;
 import com.skybory.seoulArt.domain.user.dto.CreatorIntroduceRequest;
 import com.skybory.seoulArt.domain.user.dto.CreatorIntroduceResponse;
 import com.skybory.seoulArt.domain.user.dto.CreatorDetailResponse;
 import com.skybory.seoulArt.domain.user.dto.CreatorListResponse;
 import com.skybory.seoulArt.domain.user.dto.ImageRequest;
 import com.skybory.seoulArt.domain.user.dto.ImageResponse;
+import com.skybory.seoulArt.domain.user.dto.MyAnswerListResponse;
+import com.skybory.seoulArt.domain.user.dto.MyReviewListResponse;
 import com.skybory.seoulArt.domain.user.dto.UserMobileRequest;
 import com.skybory.seoulArt.domain.user.dto.UserMobileResponse;
 import com.skybory.seoulArt.domain.user.service.UserService;
@@ -110,4 +114,32 @@ public class UserController {
 		return ResponseEntity.ok(userService.putProfileImage(request, requestServlet));
 	}
 	
+	
+	@GetMapping("/question")
+	@Secured({"ROLE_USER", "ROLE_ADMIN", "ROLE_CREATOR"})
+	@Operation(summary = "내가 작성한 질문 목록", description = "내가 작성한 질문 목록을 불러옵니다")
+	@ApiResponse(responseCode="200", description="성공")
+	@ApiResponse(responseCode="400", description="에러")
+	public ResponseEntity<List<GetQuestionListResponse>> getMyQuestionList(HttpServletRequest requestServlet) throws IOException {
+		return ResponseEntity.ok(userService.getMyQuestionList(requestServlet));
+	}
+	
+
+	@GetMapping("/review")
+	@Secured({"ROLE_USER", "ROLE_ADMIN", "ROLE_CREATOR"})
+	@Operation(summary = "내가 작성한 후기 목록", description = "내가 작성한 후기 목록을 불러옵니다")
+	@ApiResponse(responseCode="200", description="성공")
+	@ApiResponse(responseCode="400", description="에러")
+	public ResponseEntity<List<MyReviewListResponse>> getMyReviewList(HttpServletRequest requestServlet) throws IOException {
+		return ResponseEntity.ok(userService.getMyReviewList(requestServlet));
+	}
+
+	@GetMapping("/answer")
+	@Secured({"ROLE_USER", "ROLE_ADMIN", "ROLE_CREATOR"})
+	@Operation(summary = "내가 작성한 답변 목록", description = "내가 작성한 답변 목록을 불러옵니다")
+	@ApiResponse(responseCode="200", description="성공")
+	@ApiResponse(responseCode="400", description="에러")
+	public ResponseEntity<List<MyAnswerListResponse>> getMyAnswerList(HttpServletRequest requestServlet) throws IOException {
+		return ResponseEntity.ok(userService.getMyAnswerList(requestServlet));
+	}
 }
